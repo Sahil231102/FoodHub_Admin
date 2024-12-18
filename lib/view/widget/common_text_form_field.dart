@@ -13,13 +13,14 @@ class CommonTextFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return  TextFormField(onTap:onTap ,
       validator: validator,
       controller: controller,
       decoration: InputDecoration(
         hintText: hintText,
 
-        hintStyle:  AppTextStyle.w600(),
+        hintStyle:  AppTextStyle.w600(fontSize: 15,color: AppColors.grey),
         enabledBorder: _Border(color: AppColors.grey),
         focusedBorder: _Border(),
         disabledBorder: _Border(),
