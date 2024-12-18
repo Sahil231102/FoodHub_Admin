@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:food_hub_admin/view/widget/common_button.dart';
-import 'package:food_hub_admin/view/widget/common_text_form_field.dart';
-
-import 'view/auth/login_screen.dart';
+import 'package:food_hub_admin/view/home/dashboard_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -20,7 +17,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const LoginScreen(),
+      home: const DashboardScreen(),
     );
   }
 }
