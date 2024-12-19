@@ -18,6 +18,7 @@ class CommonTextFormField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      style: AppTextStyle.w600(fontSize: 18),
       onTap: onTap,
       validator: validator,
       controller: controller,
@@ -28,6 +29,7 @@ class CommonTextFormField extends StatelessWidget {
         focusedBorder: _Border(),
         disabledBorder: _Border(),
         focusedErrorBorder: _Border(color: AppColors.red),
+        errorStyle: AppTextStyle.w500(fontSize: 13, color: AppColors.red),
         errorBorder: _Border(
           color: AppColors.red,
         ),
