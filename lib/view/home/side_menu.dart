@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:food_hub_admin/const/colors.dart';
 import 'package:food_hub_admin/view/home/add_item_screen.dart';
+import 'package:food_hub_admin/view/home/dashboard_screen.dart';
 import 'package:food_hub_admin/view/widget/common_text.dart';
 import 'package:food_hub_admin/view/widget/sized_box.dart';
 import 'package:get/get.dart';
@@ -48,7 +49,9 @@ class _SideMenuState extends State<SideMenu> {
               'Dashboard',
               style: AppTextStyle.w700(fontSize: 16),
             ),
-            onTap: () {},
+            onTap: () {
+              Get.to(() => DashboardScreen());
+            },
           ),
           ListTile(
             leading: const Icon(
