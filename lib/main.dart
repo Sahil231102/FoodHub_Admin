@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:food_hub_admin/firebase_options.dart';
-import 'package:food_hub_admin/view/home/add_item_screen.dart';
+import 'package:food_hub_admin/view/home/dashboard_screen.dart';
 import 'package:get/get.dart';
 
 void main() async {
@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: AddItemScreen(),
+      home: DashboardScreen(),
     );
   }
 }

@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 const _path = "assets/img";
 
 class AppImages {
@@ -9,4 +7,5 @@ class AppImages {
   static const String logo = "$_path/logo.png";
   static const String food = "$_path/food_img.jpg";
   static const String addFood = "$_path/addFood.png";
+  static const String notFoundFood = "$_path/not_found_food_item.png";
 }

@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image/image.dart' as img; // Image package for resizing
 import 'package:image_picker/image_picker.dart';
 
 class ImagePickerService extends GetxController {
@@ -12,30 +13,29 @@ class ImagePickerService extends GetxController {
   bool loading = false;
 
   Future<void> pickMultipleImages() async {
-    if (selectedImages.length >= 20) {
+    if (selectedImages.length >= 5) {
       Get.snackbar(
         "Error",
-        "Maximum 20 images allowed",
+        "You can't select more than 5 images.",
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
       return;
     }
 
-    final List<XFile> images = await picker.pickMultiImage(imageQuality: 10);
+    final List<XFile> images = await picker.pickMultiImage(imageQuality: 50);
 
     if (images.isEmpty) return;
 
     if (selectedImages.length + images.length > 5) {
       Get.snackbar(
         "Error",
-        "Can't add more than 5 images. Please select fewer images.",
+        "You can't select more than 5 images in total.",
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
       return;
     }
-
     selectedImages.addAll(images);
     update();
   }
@@ -56,19 +56,27 @@ class ImagePickerService extends GetxController {
   }) async {
     try {
       loading = true;
-      update(); // This triggers the UI update
+      update();
 
       final List<String> base64Images = [];
 
-      // Convert all images to base64
       for (final XFile image in selectedImages) {
         final Uint8List bytes = await image.readAsBytes();
-        final String base64Image = base64Encode(bytes);
+
+        final img.Image imageObj = img.decodeImage(Uint8List.fromList(bytes))!;
+        final img.Image resized = img.copyResize(imageObj, width: 500, height: 500);
+
+        final List<int> resizedBytes =
+            img.encodeJpg(resized, quality: 85); // Use JPG format for smaller size
+        final String base64Image = base64Encode(resizedBytes);
+
         base64Images.add(base64Image);
       }
+      DocumentReference docRef = FirebaseFirestore.instance.collection('FoodItems').doc();
+      String documentId = docRef.id;
 
-      // Upload to Firestore
-      await FirebaseFirestore.instance.collection('FoodItems').doc().set({
+      await docRef.set({
+        'food_id': documentId,
         'food_name': foodName.trim(),
         'food_price': foodPrice.trim(),
         'food_category': foodCategory.trim(),
@@ -77,7 +85,6 @@ class ImagePickerService extends GetxController {
         'uploaded_at': FieldValue.serverTimestamp(),
       });
 
-      // Show success message
       Get.snackbar(
         "Success",
         "Food item added successfully",
@@ -85,14 +92,14 @@ class ImagePickerService extends GetxController {
         colorText: Colors.white,
       );
 
-      // Clear the selected images
       selectedImages.clear();
-      loading = false; // Stop the loading state
+      loading = false;
       update();
     } catch (e) {
-      loading = false; // Stop the loading state in case of an error
+      loading = false;
       update();
       print("Error adding food item: $e");
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error adding food item: $e")),
       );

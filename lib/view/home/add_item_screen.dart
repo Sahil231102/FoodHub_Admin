@@ -26,6 +26,18 @@ class _AddItemScreenState extends State<AddItemScreen> {
   TextEditingController foodCategory = TextEditingController();
   TextEditingController foodDescription = TextEditingController();
 
+  String? _selectedCategory;
+
+  // Sample list of categories
+  final List<String> _categories = [
+    'Fast Food',
+    'Burgers',
+    'Fried Foods',
+    'Street Food',
+    'Drinks and Sides',
+    "Combo Meals",
+  ];
+
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -45,6 +57,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(child: _buildImageGrid(controller)),
                   20.sizeHeight,
@@ -112,7 +125,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 4,
+              crossAxisCount: 3,
               crossAxisSpacing: 8,
               mainAxisSpacing: 8,
             ),
@@ -200,12 +213,39 @@ class _AddItemScreenState extends State<AddItemScreen> {
             },
           ),
           20.sizeHeight,
-          CommonTextFormField(
-            controller: foodCategory,
-            hintText: "Enter Food Category",
-            validator: (p0) {
-              if (p0 != null && p0.isEmpty) {
-                return "Please Enter Food Category";
+          // CommonTextFormField(
+          //   controller: foodCategory,
+          //   hintText: "Enter Food Category",
+          //   validator: (p0) {
+          //     if (p0 != null && p0.isEmpty) {
+          //       return "Please Enter Food Category";
+          //     }
+          //     return null;
+          //   },
+          // ),
+          DropdownButtonFormField<String>(
+            value: _selectedCategory,
+            decoration: InputDecoration(
+              hintText: 'Select Food Category',
+              hintStyle: AppTextStyle.w600(fontSize: 15),
+              border: OutlineInputBorder(),
+            ),
+            items: _categories.map((category) {
+              return DropdownMenuItem(
+                value: category,
+                child: Text(
+                  category,
+                  style: AppTextStyle.w700(fontSize: 17, color: AppColors.black),
+                ),
+              );
+            }).toList(),
+            onChanged: (value) {
+              _selectedCategory = value;
+              foodCategory.text = _selectedCategory.toString();
+            },
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please select a food category';
               }
               return null;
             },
