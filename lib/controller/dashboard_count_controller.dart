@@ -1,9 +1,15 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:food_hub_admin/services/firebase_service.dart';
 import 'package:get/get.dart';
 
 class DashboardCountController extends GetxController {
-  var foodItemCount = 0;
-  var userCount = 0;
+  int foodItemCount = 0;
+  int userCount = 0;
+  bool isLoad = false;
+
+  void toggleLoad(bool value) {
+    isLoad = value;
+    update();
+  }
 
   @override
   void onInit() {
@@ -13,11 +19,10 @@ class DashboardCountController extends GetxController {
   }
 
   // Method to fetch the count of food items from Firestore
-  void fetchFoodItemCount() async {
+  Future<void> fetchFoodItemCount() async {
     try {
-      final foodItemCollection = FirebaseFirestore.instance.collection('FoodItems');
+      final foodItemCollection = FirebaseServices.foodItemsCollection;
       final querySnapshot = await foodItemCollection.get();
-
       foodItemCount = querySnapshot.size;
       update();
     } catch (e) {
@@ -25,11 +30,12 @@ class DashboardCountController extends GetxController {
     }
   }
 
-  void fetchUserCount() async {
+  Future<void> fetchUserCount() async {
     try {
-      final userCollection = FirebaseFirestore.instance.collection('user');
+      final userCollection = FirebaseServices.userCollection;
       final querySnapshot = await userCollection.get();
       userCount = querySnapshot.size;
+      update();
     } catch (e) {
       Get.snackbar("====>ERROR<====", "$e");
     }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:food_hub_admin/const/colors.dart';
 import 'package:food_hub_admin/view/home/add_item_screen.dart';
 import 'package:food_hub_admin/view/home/dashboard_screen.dart';
+import 'package:food_hub_admin/view/home/order_screen.dart';
 import 'package:food_hub_admin/view/home/show_item_screen.dart';
 import 'package:food_hub_admin/view/widget/common_text.dart';
 import 'package:food_hub_admin/view/widget/sized_box.dart';
@@ -102,7 +103,9 @@ class _SideMenuState extends State<SideMenu> {
               'Order',
               style: AppTextStyle.w700(fontSize: 16),
             ),
-            onTap: () {},
+            onTap: () {
+              Get.to(() => const OrderScreen());
+            },
           ),
           ListTile(
             leading: const Icon(
@@ -114,12 +117,12 @@ class _SideMenuState extends State<SideMenu> {
             ),
             onTap: () {},
           ),
-          220.sizeHeight,
+          150.sizeHeight,
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(
-                width: 130,
+                width: 140,
                 height: 40,
                 child: ElevatedButton(
                   onPressed: () {},
@@ -130,9 +133,9 @@ class _SideMenuState extends State<SideMenu> {
                         Icons.power_settings_new,
                         color: AppColors.white,
                       ),
-                      8.sizeWidth,
+                      5.sizeWidth,
                       Text(
-                        "Login",
+                        "LOGOUT",
                         style: AppTextStyle.w700(color: Colors.white, fontSize: 15),
                       ),
                     ],

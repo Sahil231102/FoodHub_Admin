@@ -19,6 +19,8 @@ class AddItemScreen extends StatefulWidget {
 }
 
 class _AddItemScreenState extends State<AddItemScreen> {
+  final ImagePickerController _imagePickerController = Get.put(ImagePickerController());
+
   TextEditingController foodName = TextEditingController();
   TextEditingController foodPrice = TextEditingController();
   TextEditingController foodCategory = TextEditingController();

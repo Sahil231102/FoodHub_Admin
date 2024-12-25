@@ -130,25 +130,35 @@ class _ShowItemScreenState extends State<ShowItemScreen> {
                                       fit: BoxFit.cover,
                                     ),
                             ),
+                            15.sizeWidth,
                             Expanded(
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  Text(
-                                    foodName,
-                                    style: AppTextStyle.w700(fontSize: 20),
+                                  Expanded(
+                                    flex: 5,
+                                    child: Text(
+                                      foodName,
+                                      style: AppTextStyle.w700(fontSize: 20),
+                                    ),
                                   ),
-                                  Center(
+                                  15.sizeWidth,
+                                  Expanded(
+                                    flex: 3,
                                     child: Text(
                                       foodCategory,
                                       style: AppTextStyle.w700(fontSize: 20),
                                     ),
                                   ),
-                                  Text(
-                                    "Price: ₹$foodPrice",
-                                    style: AppTextStyle.w700(
-                                      fontSize: 20,
-                                      color: AppColors.green,
+                                  15.sizeWidth,
+                                  Expanded(
+                                    flex: 1,
+                                    child: Text(
+                                      "Price:\n ₹$foodPrice",
+                                      style: AppTextStyle.w700(
+                                        fontSize: 20,
+                                        color: AppColors.green,
+                                      ),
                                     ),
                                   ),
                                   ElevatedButton(

@@ -7,7 +7,6 @@ import 'package:food_hub_admin/const/Images.dart';
 import 'package:food_hub_admin/const/colors.dart';
 import 'package:food_hub_admin/controller/dashboard_count_controller.dart';
 import 'package:food_hub_admin/view/home/food_details_screen.dart';
-import 'package:food_hub_admin/view/home/side_menu.dart';
 import 'package:food_hub_admin/view/widget/common_text.dart';
 import 'package:food_hub_admin/view/widget/dashboard_common_counter_button.dart';
 import 'package:food_hub_admin/view/widget/sized_box.dart';
@@ -21,59 +20,64 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  final DashboardCountController dashboardCountController = Get.put(DashboardCountController());
+  DashboardCountController _dashboardCountController = Get.put(DashboardCountController());
 
   @override
   void initState() {
     super.initState();
-    dashboardCountController.userCount;
-    dashboardCountController.foodItemCount;
+    loadInitData();
   }
 
-  // Method to fetch the count of food items from Firestore
+  Future<void> loadInitData() async {
+    _dashboardCountController.toggleLoad(true);
+    await _dashboardCountController.fetchUserCount();
+    await _dashboardCountController.fetchFoodItemCount();
+    _dashboardCountController.toggleLoad(false);
+
+    data = [
+      {"nameText": "Total Order", "countText": "120", "color": Colors.pink},
+      {"nameText": "Total Payment", "countText": "15000", "color": Colors.black},
+      {
+        "nameText": "Total Menu Item",
+        "countText": "${_dashboardCountController.foodItemCount}",
+        "color": Colors.purpleAccent
+      },
+      {
+        "nameText": "Total Customers",
+        "countText": "${_dashboardCountController.userCount}",
+        "color": Colors.yellow
+      }
+    ];
+  }
+
+  late List<Map<String, dynamic>> data = [];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        drawer: const SideMenu(),
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          title: Text(
-            "Dashboard",
-            style: AppTextStyle.w700(
-              fontSize: 20,
-            ),
-          ),
-        ),
-        body: SingleChildScrollView(
+    return GetBuilder<DashboardCountController>(
+      builder: (controller) {
+        // if (controller.isLoad) {
+        //   return const Center(child: CircularProgressIndicator());
+        // }
+
+        return SingleChildScrollView(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  const DashboardCommonCounterButton(
-                    nameText: "Total Order",
-                    countText: "120",
-                    colors: Colors.pink,
-                  ),
-                  const DashboardCommonCounterButton(
-                    nameText: "Total Payment",
-                    countText: "15000",
-                    colors: Colors.black,
-                  ),
-                  DashboardCommonCounterButton(
-                    nameText: "Total Menu Item",
-                    countText: "${dashboardCountController.foodItemCount}",
-                    // Display the food item count here
-                    nameTextColor: AppColors.black,
-                    countTextColor: AppColors.black,
-                    colors: Colors.amberAccent.shade100,
-                  ),
-                  const DashboardCommonCounterButton(
-                    nameText: "Total Customers",
-                    countText: "",
-                  ),
-                ],
+              Wrap(
+                children: List.generate(
+                  data.length,
+                  (index) {
+                    final dataData = data[index];
+
+                    return DashboardCommonCounterButton(
+                      nameText: dataData["nameText"],
+                      countText: dataData["countText"],
+                      colors: dataData["color"],
+                    );
+                  },
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 100),
@@ -246,6 +250,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ],
           ),
-        ));
+        );
+      },
+    );
   }
 }
