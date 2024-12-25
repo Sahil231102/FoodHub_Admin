@@ -3,11 +3,12 @@ import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:food_hub_admin/services/firebase_service.dart';
 import 'package:get/get.dart';
 import 'package:image/image.dart' as img; // Image package for resizing
 import 'package:image_picker/image_picker.dart';
 
-class ImagePickerService extends GetxController {
+class ImagePickerController extends GetxController {
   final ImagePicker picker = ImagePicker();
   final List<XFile> selectedImages = [];
   bool loading = false;
@@ -72,7 +73,7 @@ class ImagePickerService extends GetxController {
 
         base64Images.add(base64Image);
       }
-      DocumentReference docRef = FirebaseFirestore.instance.collection('FoodItems').doc();
+      DocumentReference docRef = FirebaseServices.foodItemsCollection.doc();
       String documentId = docRef.id;
 
       await docRef.set({
@@ -98,11 +99,26 @@ class ImagePickerService extends GetxController {
     } catch (e) {
       loading = false;
       update();
-      print("Error adding food item: $e");
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error adding food item: $e")),
       );
     }
+  }
+
+  Future<void> removeItem({
+    required foodId,
+  }) async {
+    DocumentReference documentReference = FirebaseServices.foodItemsCollection.doc(foodId);
+
+    if (foodId != null) {
+      await documentReference.delete();
+
+      Get.snackbar(
+        "Remove Items",
+        "Successfully Remove Item.....",
+        backgroundColor: Colors.green,
+      );
+    } else {}
   }
 }

@@ -3,9 +3,10 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:food_hub_admin/view/widget/common_text.dart';
+import 'package:food_hub_admin/view/widget/sized_box.dart';
 
 class FoodDetailsScreen extends StatefulWidget {
-  final String documentId; // Accept documentId as a parameter
+  final String documentId;
 
   const FoodDetailsScreen({super.key, required this.documentId});
 
@@ -14,14 +15,13 @@ class FoodDetailsScreen extends StatefulWidget {
 }
 
 class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
   late Future<DocumentSnapshot> foodDetailsFuture;
 
   @override
   void initState() {
     super.initState();
-    // Fetch the food details using the documentId
-    foodDetailsFuture = _firestore.collection('FoodItems').doc(widget.documentId).get();
+    foodDetailsFuture = _fireStore.collection('FoodItems').doc(widget.documentId).get();
   }
 
   @override
@@ -61,7 +61,6 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
             );
           }
 
-          // Extract data from the snapshot
           final foodData = snapshot.data!.data() as Map<String, dynamic>;
           final List<dynamic> images = foodData['images'] ?? [];
           final String foodName = foodData['food_name'] ?? "Unknown";
@@ -78,16 +77,17 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
                   "Images:",
                   style: AppTextStyle.w700(fontSize: 20),
                 ),
-                const SizedBox(height: 10),
+                10.sizeHeight,
                 SizedBox(
-                  height: 320,
+                  height: 290,
+                  width: 3020,
                   child: GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: images.length,
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 5,
-                      crossAxisSpacing: 10,
+                      crossAxisSpacing: 80,
                       mainAxisSpacing: 8,
                     ),
                     itemBuilder: (context, index) {
@@ -106,7 +106,7 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
                     },
                   ),
                 ),
-                const SizedBox(height: 20),
+                20.sizeHeight,
                 Table(
                   columnWidths: const {
                     0: FlexColumnWidth(2),

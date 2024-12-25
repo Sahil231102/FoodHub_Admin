@@ -43,7 +43,7 @@ class _CommonButtonState extends State<CommonButton> {
             BoxShadow(
               color: widget.shadowColor ?? Colors.black.withOpacity(0.2),
               blurRadius: 5,
-              offset: Offset(1, 1),
+              offset: const Offset(1, 1),
             ),
           ],
         ),
@@ -51,7 +51,7 @@ class _CommonButtonState extends State<CommonButton> {
         child: Text(
           widget.text!,
           style: widget.textStyle ??
-              TextStyle(
+              const TextStyle(
                 color: Colors.white,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,

@@ -4,7 +4,7 @@ import 'package:food_hub_admin/view/widget/common_text.dart';
 import 'package:get/get.dart';
 
 class AppDefaultDialog {
-  static void Showsucess({String? title, String? message}) {
+  static void Showsuccess({String? title, String? message}) {
     Get.defaultDialog(
       title: "Success",
       titleStyle: AppTextStyle.w700(color: AppColors.black, fontSize: 20),
@@ -12,17 +12,17 @@ class AppDefaultDialog {
       middleTextStyle: AppTextStyle.w700(color: AppColors.black, fontSize: 20),
       backgroundColor: AppColors.white,
       radius: 10,
-      contentPadding: EdgeInsets.all(20),
+      contentPadding: const EdgeInsets.all(20),
       confirm: ElevatedButton(
         onPressed: () {
           Get.back(); // Close the dialog
         },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.green,
+        ),
         child: Text(
           "OK",
           style: AppTextStyle.w700(fontSize: 16, color: AppColors.white),
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.green,
         ),
       ),
     );

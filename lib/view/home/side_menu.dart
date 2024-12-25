@@ -35,7 +35,7 @@ class _SideMenuState extends State<SideMenu> {
                 ),
               ),
               currentAccountPicture: Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                     color: AppColors.black,
                     image: DecorationImage(
@@ -51,7 +51,7 @@ class _SideMenuState extends State<SideMenu> {
               style: AppTextStyle.w700(fontSize: 16),
             ),
             onTap: () {
-              Get.to(() => DashboardScreen());
+              Get.to(() => const DashboardScreen());
             },
           ),
           ListTile(
@@ -71,7 +71,7 @@ class _SideMenuState extends State<SideMenu> {
               style: AppTextStyle.w700(fontSize: 16),
             ),
             onTap: () {
-              Get.to(() => AddItemScreen());
+              Get.to(() => const AddItemScreen());
             },
           ),
           ListTile(
@@ -81,7 +81,7 @@ class _SideMenuState extends State<SideMenu> {
               style: AppTextStyle.w700(fontSize: 16),
             ),
             onTap: () {
-              Get.to(() => ShowItemScreen());
+              Get.to(() => const ShowItemScreen());
             },
           ),
           ListTile(

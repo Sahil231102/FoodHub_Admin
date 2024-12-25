@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:food_hub_admin/const/colors.dart';
-import 'package:food_hub_admin/services/image_picker_services.dart';
+import 'package:food_hub_admin/controller/image_picker_controller.dart';
 import 'package:food_hub_admin/view/home/side_menu.dart';
 import 'package:food_hub_admin/view/widget/common_text.dart';
 import 'package:food_hub_admin/view/widget/common_text_form_field.dart';
@@ -19,8 +19,6 @@ class AddItemScreen extends StatefulWidget {
 }
 
 class _AddItemScreenState extends State<AddItemScreen> {
-  final ImagePickerService _imagePickerServices = Get.put(ImagePickerService());
-
   TextEditingController foodName = TextEditingController();
   TextEditingController foodPrice = TextEditingController();
   TextEditingController foodCategory = TextEditingController();
@@ -51,7 +49,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
         ),
       ),
       drawer: const SideMenu(),
-      body: GetBuilder<ImagePickerService>(
+      body: GetBuilder<ImagePickerController>(
         builder: (controller) {
           return SafeArea(
             child: SingleChildScrollView(
@@ -71,7 +69,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
     );
   }
 
-  Widget _buildImageGrid(ImagePickerService controller) {
+  Widget _buildImageGrid(ImagePickerController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -138,7 +136,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
     );
   }
 
-  Widget _buildImageTile(XFile image, ImagePickerService controller, int index) {
+  Widget _buildImageTile(XFile image, ImagePickerController controller, int index) {
     return Stack(
       children: [
         Container(
@@ -186,7 +184,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
     );
   }
 
-  Widget _buildForm(ImagePickerService controller) {
+  Widget _buildForm(ImagePickerController controller) {
     return Form(
       key: _formKey,
       child: Column(
@@ -228,7 +226,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
             decoration: InputDecoration(
               hintText: 'Select Food Category',
               hintStyle: AppTextStyle.w600(fontSize: 15),
-              border: OutlineInputBorder(),
+              border: const OutlineInputBorder(),
             ),
             items: _categories.map((category) {
               return DropdownMenuItem(
