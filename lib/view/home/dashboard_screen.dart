@@ -45,7 +45,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       {
         "nameText": "Total Customers",
         "countText": "${_dashboardCountController.userCount}",
-        "color": Colors.yellow
+        "color": Colors.red
       }
     ];
   }
@@ -56,14 +56,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     return GetBuilder<DashboardCountController>(
       builder: (controller) {
-        // if (controller.isLoad) {
-        //   return const Center(child: CircularProgressIndicator());
-        // }
+        if (controller.isLoad) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
         return SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Wrap(
                 children: List.generate(

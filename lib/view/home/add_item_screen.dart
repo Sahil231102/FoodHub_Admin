@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:food_hub_admin/const/colors.dart';
 import 'package:food_hub_admin/controller/image_picker_controller.dart';
-import 'package:food_hub_admin/view/home/side_menu.dart';
 import 'package:food_hub_admin/view/widget/common_text.dart';
 import 'package:food_hub_admin/view/widget/common_text_form_field.dart';
 import 'package:food_hub_admin/view/widget/sized_box.dart';
@@ -43,27 +42,33 @@ class _AddItemScreenState extends State<AddItemScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: Text(
-          "Add Food",
-          style: AppTextStyle.w700(fontSize: 20),
-        ),
-      ),
-      drawer: const SideMenu(),
       body: GetBuilder<ImagePickerController>(
         builder: (controller) {
           return SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(child: _buildImageGrid(controller)),
-                  20.sizeHeight,
-                  Expanded(child: _buildForm(controller)),
-                ],
-              ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                // Check if the layout is for web or mobile
+                final isWeb = constraints.maxWidth > 600;
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: isWeb
+                      ? Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: _buildImageGrid(controller)),
+                            20.sizeHeight,
+                            Expanded(child: _buildForm(controller)),
+                          ],
+                        )
+                      : Column(
+                          children: [
+                            _buildImageGrid(controller),
+                            20.sizeHeight,
+                            _buildForm(controller),
+                          ],
+                        ),
+                );
+              },
             ),
           );
         },
@@ -82,22 +87,18 @@ class _AddItemScreenState extends State<AddItemScreen> {
               "Food Images (${controller.selectedImages.length}/5)",
               style: AppTextStyle.w600(fontSize: 16),
             ),
+            50.sizeWidth,
             if (controller.selectedImages.length < 5)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 50),
-                child: ElevatedButton.icon(
+              IconButton(
+                  autofocus: true,
+                  constraints:
+                      BoxConstraints(minWidth: 2, maxWidth: 120, maxHeight: 120, minHeight: 20),
                   onPressed: () => controller.pickMultipleImages(),
-                  icon: const Icon(Icons.add_photo_alternate),
-                  label: const Text("Add Images"),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                  ),
-                ),
-              ),
+                  icon: Icon(
+                    Icons.add,
+                  )),
           ],
         ),
-        10.sizeHeight,
         if (controller.selectedImages.isEmpty)
           Center(
             child: Container(
@@ -213,16 +214,6 @@ class _AddItemScreenState extends State<AddItemScreen> {
             },
           ),
           20.sizeHeight,
-          // CommonTextFormField(
-          //   controller: foodCategory,
-          //   hintText: "Enter Food Category",
-          //   validator: (p0) {
-          //     if (p0 != null && p0.isEmpty) {
-          //       return "Please Enter Food Category";
-          //     }
-          //     return null;
-          //   },
-          // ),
           DropdownButtonFormField<String>(
             value: _selectedCategory,
             decoration: InputDecoration(

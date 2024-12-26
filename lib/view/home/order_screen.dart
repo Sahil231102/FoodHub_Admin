@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:food_hub_admin/const/colors.dart';
-import 'package:food_hub_admin/view/home/side_menu.dart';
-import 'package:food_hub_admin/view/widget/Common_appbar.dart';
 import 'package:food_hub_admin/view/widget/common_text.dart';
 
 class Order {
@@ -78,8 +76,6 @@ class _OrderScreenState extends State<OrderScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: SideMenu(),
-      appBar: CommonAppbar(text: "Order Screen"),
       body: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: DataTable(

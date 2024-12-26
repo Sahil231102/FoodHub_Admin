@@ -20,8 +20,9 @@ class DashboardCommonCounterButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(15.0),
       child: Container(
+        constraints: BoxConstraints(minHeight: 50, maxWidth: 280, maxHeight: 100, minWidth: 0),
         decoration: BoxDecoration(
           color: colors ?? AppColors.primary,
           borderRadius: BorderRadius.circular(15),

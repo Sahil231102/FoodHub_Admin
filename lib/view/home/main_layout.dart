@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:food_hub_admin/view/home/app_screens.dart';
 import 'package:food_hub_admin/view/home/navigation_rail.dart';
+import 'package:food_hub_admin/view/widget/common_text.dart';
 
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
@@ -20,7 +21,13 @@ class _MainLayoutState extends State<MainLayout> {
     return Scaffold(
       key: scaffoldKey,
       appBar: AppBar(
-        title: Text(currentScreen),
+        title: Text(
+          currentScreen,
+          style: AppTextStyle.w700(
+            color: Colors.red,
+            fontSize: 20,
+          ),
+        ),
         leading: isMobile
             ? IconButton(
                 icon: const Icon(Icons.menu),
