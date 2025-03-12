@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:food_hub_admin/const/Images.dart';
 import 'package:food_hub_admin/services/firebase_service.dart';
 import 'package:food_hub_admin/view/widget/common_text.dart';
+import 'package:intl/intl.dart';
 
 class UserInformationScreen extends StatefulWidget {
   const UserInformationScreen({super.key});
@@ -50,7 +51,7 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
                     width: 400,
                   ),
                   Text(
-                    "No Food Items. Add Food Item.",
+                    "No Users Found.",
                     style: AppTextStyle.w700(fontSize: 20),
                   ),
                 ],
@@ -66,47 +67,46 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(50.0),
                 child: DataTable(
-                  headingTextStyle: AppTextStyle.w700(
-                    fontSize: 20,
-                  ),
+                  headingTextStyle: AppTextStyle.w700(fontSize: 20),
                   dataTextStyle: AppTextStyle.w700(fontSize: 15),
                   columnSpacing: 35,
                   border: TableBorder.all(color: Colors.black),
                   columns: const [
-                    DataColumn(
-                      label: Text("Index"),
-                    ),
-                    DataColumn(
-                      label: Text("Name"),
-                    ),
-                    DataColumn(
-                      label: Text("Email"),
-                    ),
-                    DataColumn(
-                      label: Text("Last Login"),
-                    ),
+                    DataColumn(label: Text("Index")),
+                    DataColumn(label: Text("Name")),
+                    DataColumn(label: Text("Email")),
+                    DataColumn(label: Text("Last Login")),
                   ],
                   rows: userinfo.asMap().entries.map((entry) {
                     final userIndex = entry.key + 1;
                     final user = entry.value;
                     final String customerName = user["name"] ?? "N/A";
                     final String customerEmail = user['email'] ?? "N/A";
-                    final String lastLogin = user['last_login_time'] ?? "N/A";
+                    final String lastLoginString =
+                        user['last_login_time'] ?? "N/A";
+
+                    // Convert last login string to DateTime
+                    DateTime? lastLogin;
+                    if (lastLoginString != "N/A") {
+                      try {
+                        lastLogin = DateTime.parse(lastLoginString);
+                      } catch (e) {
+                        lastLogin = null;
+                      }
+                    }
+
+                    // Format date if valid
+                    String formattedLastLogin = lastLogin != null
+                        ? DateFormat('dd-MM-yyyy hh:mm a').format(lastLogin)
+                        : "Invalid Date";
 
                     return DataRow(
                       cells: [
+                        DataCell(Text(userIndex.toString())),
+                        DataCell(Text(customerName)),
+                        DataCell(Text(customerEmail)),
                         DataCell(
-                          Text(userIndex.toString()),
-                        ),
-                        DataCell(
-                          Text(customerName),
-                        ),
-                        DataCell(
-                          Text(customerEmail),
-                        ),
-                        DataCell(
-                          Text(lastLogin),
-                        ),
+                            Text(formattedLastLogin)), // Updated date format
                       ],
                     );
                   }).toList(),

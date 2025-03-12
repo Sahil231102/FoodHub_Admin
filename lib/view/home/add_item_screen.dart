@@ -246,6 +246,8 @@ class _AddItemScreenState extends State<AddItemScreen> {
                         );
                       } else {
                         return DropdownButtonFormField<String>(
+                          style: AppTextStyle.w500(
+                              fontSize: 15, color: AppColors.black),
                           value: showCategoryController
                                   .selectedCategory.value.isEmpty
                               ? null
