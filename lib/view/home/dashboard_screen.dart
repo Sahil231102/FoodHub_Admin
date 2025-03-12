@@ -1,15 +1,12 @@
-import 'dart:convert';
-import 'dart:typed_data';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:food_hub_admin/const/Images.dart';
 import 'package:food_hub_admin/const/colors.dart';
 import 'package:food_hub_admin/controller/dashboard_count_controller.dart';
+import 'package:food_hub_admin/services/firebase_service.dart';
 import 'package:food_hub_admin/view/home/food_details_screen.dart';
 import 'package:food_hub_admin/view/widget/common_text.dart';
 import 'package:food_hub_admin/view/widget/dashboard_common_counter_button.dart';
-import 'package:food_hub_admin/view/widget/sized_box.dart';
 import 'package:get/get.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -20,7 +17,10 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  DashboardCountController _dashboardCountController = Get.put(DashboardCountController());
+  final DashboardCountController _dashboardCountController =
+      Get.put(DashboardCountController());
+
+  late List<Map<String, dynamic>> data = [];
 
   @override
   void initState() {
@@ -36,21 +36,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     data = [
       {"nameText": "Total Order", "countText": "120", "color": Colors.pink},
-      {"nameText": "Total Payment", "countText": "15000", "color": Colors.black},
+      {
+        "nameText": "Total Payment",
+        "countText": "15000",
+        "color": Colors.black
+      },
       {
         "nameText": "Total Menu Item",
         "countText": "${_dashboardCountController.foodItemCount}",
-        "color": Colors.purpleAccent
+        "color": Colors.purpleAccent,
       },
       {
         "nameText": "Total Customers",
         "countText": "${_dashboardCountController.userCount}",
-        "color": Colors.red
-      }
+        "color": Colors.red,
+      },
     ];
   }
-
-  late List<Map<String, dynamic>> data = [];
 
   @override
   Widget build(BuildContext context) {
@@ -60,196 +62,154 @@ class _DashboardScreenState extends State<DashboardScreen> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        return SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Wrap(
-                children: List.generate(
-                  data.length,
-                  (index) {
-                    final dataData = data[index];
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            final isWeb = constraints.maxWidth > 600;
 
-                    return DashboardCommonCounterButton(
-                      nameText: dataData["nameText"],
-                      countText: dataData["countText"],
-                      colors: dataData["color"],
-                    );
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 100),
-                child: Row(
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Column(
                   children: [
-                    Text(
-                      "FoodImages",
-                      style: AppTextStyle.w700(fontSize: 20),
-                    ),
-                    150.sizeWidth,
-                    Text(
-                      "FoodName",
-                      style: AppTextStyle.w700(fontSize: 20),
-                    ),
-                    150.sizeWidth,
-                    Text(
-                      "FoodCategory",
-                      style: AppTextStyle.w700(fontSize: 20),
-                    ),
-                    100.sizeWidth,
-                    Text(
-                      "FoodPrice",
-                      style: AppTextStyle.w700(fontSize: 20),
-                    ),
-                    200.sizeWidth,
-                    Text(
-                      "Action",
-                      style: AppTextStyle.w700(fontSize: 20),
-                    ),
-                  ],
-                ),
-              ),
-              StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance.collection('FoodItems').snapshots(),
-                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Padding(
-                      padding: EdgeInsets.all(118.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CircularProgressIndicator(),
-                        ],
+                    Wrap(
+                      spacing: isWeb ? 20 : 10,
+                      runSpacing: 10,
+                      alignment: WrapAlignment.center,
+                      children: List.generate(
+                        data.length,
+                        (index) {
+                          final item = data[index];
+                          return DashboardCommonCounterButton(
+                            nameText: item["nameText"],
+                            countText: item["countText"],
+                            colors: item["color"],
+                          );
+                        },
                       ),
-                    );
-                  }
-
-                  if (snapshot.hasError) {
-                    return const Center(child: Text("Error loading data."));
-                  }
-
-                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return Center(
-                        child: Column(
-                      children: [
-                        const Image(
-                          image: AssetImage(AppImages.notFoundFood),
-                          height: 420,
-                          width: 400,
-                        ),
-                        Text(
-                          "Not Food Items. Add Food Item.",
-                          style: AppTextStyle.w700(fontSize: 20),
-                        )
-                      ],
-                    ));
-                  }
-
-                  final List<DocumentSnapshot> foodItems = snapshot.data!.docs;
-
-                  return ListView.builder(
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: foodItems.length,
-                    itemBuilder: (context, index) {
-                      final food = foodItems[index];
-                      final foodId = food['food_id'];
-                      final String foodName = food['food_name'] ?? 'No Name';
-                      final String foodCategory = food['food_category'] ?? 'No Category';
-                      final String foodPrice = food['food_price'] ?? '0';
-                      final List<dynamic> base64Images = food['images'] ?? [];
-
-                      Uint8List? firstImageBytes;
-                      if (base64Images.isNotEmpty) {
-                        try {
-                          firstImageBytes = base64Decode(base64Images[0]) as Uint8List?;
-                        } catch (e) {
-                          Get.snackbar("====>ERROR<====", "$e");
+                    ),
+                    StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseServices.foodItemsCollection.snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                              child: CircularProgressIndicator());
                         }
-                      }
 
-                      return SizedBox(
-                        height: 150,
-                        width: 100,
-                        child: Card(
-                          margin: const EdgeInsets.symmetric(horizontal: 90, vertical: 8),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                        if (snapshot.hasError) {
+                          return const Center(
+                              child: Text("Error loading data."));
+                        }
+
+                        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                          return Center(
+                            child: Column(
                               children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(15),
-                                  child: firstImageBytes != null
-                                      ? Image.memory(
-                                          firstImageBytes,
-                                          fit: BoxFit.cover,
-                                        )
-                                      : Image.asset(
-                                          'assets/placeholder.png', // Fallback placeholder image
-                                          width: 100,
-                                          height: 100,
-                                          fit: BoxFit.cover,
-                                        ),
+                                const Image(
+                                  image: AssetImage(AppImages.notFoundFood),
+                                  height: 420,
+                                  width: 400,
                                 ),
-                                Expanded(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Text(
-                                        foodName,
-                                        style: AppTextStyle.w700(fontSize: 20),
-                                      ),
-                                      Center(
-                                          child: Text(foodCategory,
-                                              style: AppTextStyle.w700(fontSize: 20))),
-                                      Text("Price: ₹$foodPrice",
-                                          style: AppTextStyle.w700(
-                                              fontSize: 20, color: AppColors.green)),
-                                      ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                            backgroundColor: AppColors.primary,
-                                            fixedSize: const Size(180, 50)),
-                                        onPressed: () {
-                                          Get.to(() => FoodDetailsScreen(
-                                                documentId: foodId,
-                                              ));
-                                        },
-                                        child: Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.view_agenda_outlined,
-                                              color: AppColors.white,
-                                            ),
-                                            30.sizeWidth,
-                                            Text(
-                                              "View",
-                                              style: AppTextStyle.w700(
-                                                fontSize: 20,
-                                                color: AppColors.white,
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                Text(
+                                  "No Food Items. Add Food Item.",
+                                  style: AppTextStyle.w700(fontSize: 20),
                                 ),
                               ],
                             ),
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ],
-          ),
+                          );
+                        }
+
+                        final List<DocumentSnapshot> foodItems =
+                            snapshot.data!.docs;
+
+                        return ListView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: foodItems.length,
+                          itemBuilder: (context, index) {
+                            final food = foodItems[index];
+                            final String foodName =
+                                food['food_name'] ?? 'No Name';
+                            final String foodCategory =
+                                food['food_category'] ?? 'No Category';
+                            final String foodPrice = food['food_price'] ?? '0';
+                            final List<dynamic> imageUrls =
+                                food['image_urls'] ??
+                                    []; // Corrected field name
+
+                            return Card(
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Row(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: imageUrls.isNotEmpty
+                                          ? Image.network(
+                                              imageUrls
+                                                  .first, // Show first image from Firestore
+                                              width: 80,
+                                              height: 80,
+                                              fit: BoxFit.cover,
+                                            )
+                                          : Image.asset(
+                                              'assets/placeholder.png', // Placeholder if no image found
+                                              width: 80,
+                                              height: 80,
+                                            ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(foodName,
+                                              style: AppTextStyle.w700(
+                                                  fontSize: 18)),
+                                          Text(foodCategory,
+                                              style: AppTextStyle.w700(
+                                                  fontSize: 16)),
+                                          Text(
+                                            "Price: ₹$foodPrice",
+                                            style: AppTextStyle.w700(
+                                                color: AppColors.green),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                          backgroundColor: AppColors.primary),
+                                      onPressed: () => Get.to(() =>
+                                          FoodDetailsScreen(
+                                              documentId: food['food_id'])),
+                                      child: Text(
+                                        "View",
+                                        style: AppTextStyle.w700(
+                                            color: AppColors.white,
+                                            fontSize: 18),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
         );
       },
     );

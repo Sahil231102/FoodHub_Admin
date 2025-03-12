@@ -14,7 +14,7 @@ class NavigationRailScreen extends StatelessWidget {
       width: 230,
       child: Material(
         color: Colors.black,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(0),
         textStyle: AppTextStyle.w700(color: Colors.yellow, fontSize: 10),
         elevation: 2,
         child: ListView(

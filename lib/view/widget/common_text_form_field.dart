@@ -4,14 +4,14 @@ import 'package:food_hub_admin/view/widget/common_text.dart';
 
 class CommonTextFormField extends StatelessWidget {
   final void Function()? onTap;
-  final String? hintText;
+  final String? labelText;
   final TextEditingController controller;
   final String? Function(String?)? validator;
 
   const CommonTextFormField(
       {super.key,
       this.onTap,
-      this.hintText,
+      this.labelText,
       required this.controller,
       this.validator});
 
@@ -23,8 +23,8 @@ class CommonTextFormField extends StatelessWidget {
       validator: validator,
       controller: controller,
       decoration: InputDecoration(
-        hintText: hintText,
-        hintStyle: AppTextStyle.w600(fontSize: 15, color: AppColors.grey),
+        labelText: labelText,
+        labelStyle: AppTextStyle.w600(fontSize: 15, color: AppColors.grey),
         enabledBorder: _Border(color: AppColors.grey),
         focusedBorder: _Border(),
         disabledBorder: _Border(),

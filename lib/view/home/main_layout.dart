@@ -21,6 +21,15 @@ class _MainLayoutState extends State<MainLayout> {
     return Scaffold(
       key: scaffoldKey,
       appBar: AppBar(
+        backgroundColor: Colors.black87,
+        actions: [
+          IconButton(
+              onPressed: () {},
+              icon: Icon(
+                Icons.person,
+                color: Colors.white,
+              ))
+        ],
         title: Text(
           currentScreen,
           style: AppTextStyle.w700(
@@ -30,7 +39,10 @@ class _MainLayoutState extends State<MainLayout> {
         ),
         leading: isMobile
             ? IconButton(
-                icon: const Icon(Icons.menu),
+                icon: const Icon(
+                  Icons.menu,
+                  color: Colors.white,
+                ),
                 onPressed: () => scaffoldKey.currentState?.openDrawer(),
               )
             : null,

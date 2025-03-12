@@ -64,17 +64,21 @@ class _LoginScreenState extends State<LoginScreen> {
                                 // Image Section
                                 const Expanded(
                                   child: Image(
-                                    image: AssetImage("assets/img/rb_29057.png"),
+                                    image:
+                                        AssetImage("assets/img/rb_29057.png"),
                                     width: 300,
                                     height: 300,
                                     fit: BoxFit.contain,
                                   ),
                                 ),
-                                const SizedBox(width: 20), // Spacer between image and column
+                                const SizedBox(
+                                    width:
+                                        20), // Spacer between image and column
                                 // Input Fields Section
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       // Title
@@ -86,38 +90,46 @@ class _LoginScreenState extends State<LoginScreen> {
                                       // Email Input
                                       CommonTextFormField(
                                         controller: emailController,
-                                        validator: (p0) => ValidationService.validateEmail(p0),
-                                        hintText: "Enter email",
+                                        validator: (p0) =>
+                                            ValidationService.validateEmail(p0),
+                                        labelText: "Enter email",
                                       ),
                                       20.sizeHeight,
                                       // Password Input
                                       CommonTextFormField(
                                         controller: passwordController,
                                         // Password field masking
-                                        validator: (p0) => ValidationService.validatePassword(p0),
-                                        hintText: "Enter password",
+                                        validator: (p0) =>
+                                            ValidationService.validatePassword(
+                                                p0),
+                                        labelText: "Enter password",
                                       ),
                                       20.sizeHeight,
                                       // Submit Button
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: [
                                           SizedBox(
                                             width: 220,
                                             height: 50,
                                             child: ElevatedButton(
                                               onPressed: () {
-                                                if (_formKey.currentState!.validate()) {
+                                                if (_formKey.currentState!
+                                                    .validate()) {
                                                   // Handle login logic here
-                                                  Get.to(() => const DashboardScreen());
+                                                  Get.to(() =>
+                                                      const DashboardScreen());
                                                 }
                                               },
                                               style: ElevatedButton.styleFrom(
-                                                  backgroundColor: AppColors.primary),
+                                                  backgroundColor:
+                                                      AppColors.primary),
                                               child: Text(
                                                 "Login",
                                                 style: AppTextStyle.w700(
-                                                    color: Colors.white, fontSize: 20),
+                                                    color: Colors.white,
+                                                    fontSize: 20),
                                               ),
                                             ),
                                           ),

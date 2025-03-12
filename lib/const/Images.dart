@@ -8,4 +8,5 @@ class AppImages {
   static const String food = "$_path/food_img.jpg";
   static const String addFood = "$_path/addFood.png";
   static const String notFoundFood = "$_path/not_found_food_item.png";
+  static const String category = "$_path/category.png";
 }

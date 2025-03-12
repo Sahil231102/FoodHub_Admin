@@ -1,42 +1,37 @@
-import 'dart:convert';
 import 'dart:typed_data';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:food_hub_admin/controller/flutter_image_compress.dart';
+import 'package:food_hub_admin/services/cloudinary_service.dart';
 import 'package:food_hub_admin/services/firebase_service.dart';
 import 'package:get/get.dart';
-import 'package:image/image.dart' as img; // Image package for resizing
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 class ImagePickerController extends GetxController {
   final ImagePicker picker = ImagePicker();
   final List<XFile> selectedImages = [];
   bool loading = false;
 
+  void setInitialImages(List<XFile> images) {
+    selectedImages.clear(); // Clear existing images
+    selectedImages.addAll(images); // Add initial images
+    update(); // Notify UI to refresh
+  }
+
   Future<void> pickMultipleImages() async {
     if (selectedImages.length >= 5) {
-      Get.snackbar(
-        "Error",
-        "You can't select more than 5 images.",
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+      _showError("You can't select more than 5 images.");
       return;
     }
 
     final List<XFile> images = await picker.pickMultiImage(imageQuality: 50);
-
     if (images.isEmpty) return;
-
     if (selectedImages.length + images.length > 5) {
-      Get.snackbar(
-        "Error",
-        "You can't select more than 5 images in total.",
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+      _showError("You can't select more than 5 images in total.");
       return;
     }
+
     selectedImages.addAll(images);
     update();
   }
@@ -59,66 +54,110 @@ class ImagePickerController extends GetxController {
       loading = true;
       update();
 
-      final List<String> base64Images = [];
-
-      for (final XFile image in selectedImages) {
+      final List<String?> imageUrls =
+          await Future.wait(selectedImages.map((image) async {
         final Uint8List bytes = await image.readAsBytes();
+        final Uint8List? compressedBytes =
+            await ImageCompressorUtil.compressImage(bytes);
+        return compressedBytes != null
+            ? await CloudinaryService.uploadImage(compressedBytes)
+            : null;
+      }));
 
-        final img.Image imageObj = img.decodeImage(Uint8List.fromList(bytes))!;
-        final img.Image resized = img.copyResize(imageObj, width: 500, height: 500);
+      final List<String> validImageUrls =
+          imageUrls.whereType<String>().toList();
+      if (validImageUrls.isEmpty) throw Exception("Image upload failed.");
 
-        final List<int> resizedBytes =
-            img.encodeJpg(resized, quality: 85); // Use JPG format for smaller size
-        final String base64Image = base64Encode(resizedBytes);
-
-        base64Images.add(base64Image);
-      }
-      DocumentReference docRef = FirebaseServices.foodItemsCollection.doc();
-      String documentId = docRef.id;
-
+      final docRef = FirebaseServices.foodItemsCollection.doc();
       await docRef.set({
-        'food_id': documentId,
+        'food_id': docRef.id,
         'food_name': foodName.trim(),
-        'food_price': foodPrice.trim(),
+        'food_price': foodPrice,
         'food_category': foodCategory.trim(),
         'food_description': foodDescription.trim(),
-        'images': base64Images,
+        'image_urls': validImageUrls,
         'uploaded_at': FieldValue.serverTimestamp(),
       });
 
-      Get.snackbar(
-        "Success",
-        "Food item added successfully",
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
-
+      Get.snackbar("Success", "Food item added successfully",
+          backgroundColor: Colors.green, colorText: Colors.white);
       selectedImages.clear();
-      loading = false;
-      update();
     } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error adding food item: ${e.toString()}")),
+      );
+    } finally {
       loading = false;
       update();
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error adding food item: $e")),
-      );
     }
   }
 
-  Future<void> removeItem({
-    required foodId,
+  Future<void> updateFoodDetails({
+    required String foodId,
+    required String foodName,
+    required String foodPrice,
+    required String foodCategory,
+    required String foodDescription,
+    required List<String> existingImageUrls,
+    required List<String> imagesToRemove, // Images to be removed
   }) async {
-    DocumentReference documentReference = FirebaseServices.foodItemsCollection.doc(foodId);
+    try {
+      loading = true;
+      update();
 
-    if (foodId != null) {
-      await documentReference.delete();
+      final List<String?> newImageUrls =
+          await Future.wait(selectedImages.map((image) async {
+        final Uint8List bytes = await image.readAsBytes();
+        final Uint8List? compressedBytes =
+            await ImageCompressorUtil.compressImage(bytes);
+        return compressedBytes != null
+            ? await CloudinaryService.uploadImage(compressedBytes)
+            : null;
+      }));
 
-      Get.snackbar(
-        "Remove Items",
-        "Successfully Remove Item.....",
-        backgroundColor: Colors.green,
-      );
-    } else {}
+      // Filter out images that need to be removed
+      List<String> updatedImageUrls = existingImageUrls
+          .where((url) => !imagesToRemove.contains(url))
+          .toList();
+
+      // Add new images to the list
+      updatedImageUrls.addAll(newImageUrls.whereType<String>());
+
+      await FirebaseServices.foodItemsCollection.doc(foodId).update({
+        'food_name': foodName.trim(),
+        'food_price': foodPrice,
+        'food_category': foodCategory.trim(),
+        'food_description': foodDescription.trim(),
+        'image_urls': updatedImageUrls,
+        'updated_at': FieldValue.serverTimestamp(),
+      });
+
+      Get.snackbar("Success", "Food item updated successfully",
+          backgroundColor: Colors.green, colorText: Colors.white);
+    } catch (e) {
+      Get.snackbar("Error", "Failed to update food item: ${e.toString()}",
+          backgroundColor: Colors.red, colorText: Colors.white);
+    } finally {
+      loading = false;
+      update();
+    }
+  }
+
+  Future<void> removeItem({required String foodId}) async {
+    if (foodId.isNotEmpty) {
+      try {
+        await FirebaseServices.foodItemsCollection.doc(foodId).delete();
+        Get.snackbar("Success", "Food item removed successfully",
+            backgroundColor: Colors.green, colorText: Colors.white);
+      } catch (e) {
+        Get.snackbar("Error", "Failed to remove food item: ${e.toString()}",
+            backgroundColor: Colors.red, colorText: Colors.white);
+      }
+    }
+  }
+
+  void _showError(String message) {
+    Get.snackbar("Error", message,
+        backgroundColor: Colors.red, colorText: Colors.white);
   }
 }

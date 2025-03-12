@@ -78,121 +78,124 @@ class _OrderScreenState extends State<OrderScreen> {
     return Scaffold(
       body: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        child: DataTable(
-          dataTextStyle: AppTextStyle.w700(fontSize: 15),
-          columnSpacing: 35,
-          border: TableBorder.all(color: Colors.black),
-          columns: [
-            DataColumn(
-              label: Text(
-                "Index",
-                style: AppTextStyle.w700(fontSize: 20),
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                "Food Image",
-                style: AppTextStyle.w700(fontSize: 20),
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                "Food Name",
-                style: AppTextStyle.w700(fontSize: 20),
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                "User Name",
-                style: AppTextStyle.w700(fontSize: 20),
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                "Order ID",
-                style: AppTextStyle.w700(fontSize: 20),
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                "No Of Items",
-                style: AppTextStyle.w700(fontSize: 20),
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                "Payment Type",
-                style: AppTextStyle.w700(fontSize: 20),
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                "Payment",
-                style: AppTextStyle.w700(fontSize: 20),
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                "Date",
-                style: AppTextStyle.w700(fontSize: 20),
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                "Order Status",
-                style: AppTextStyle.w700(fontSize: 20),
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                "Action",
-                style: AppTextStyle.w700(fontSize: 20),
-              ),
-            ),
-          ],
-          rows: orders.map((order) {
-            return DataRow(cells: [
-              DataCell(Text(order.index.toString())),
-              DataCell(Image.network(order.foodImage, height: 150, width: 150)),
-              DataCell(Text(order.foodname)),
-              DataCell(Text(order.username)),
-              DataCell(Text(order.orderId)),
-              DataCell(Text(order.noOfItems.toString())),
-              DataCell(Text(order.paymentType)),
-              DataCell(Text(order.payment.toStringAsFixed(2))),
-              DataCell(Text(order.date)),
-              DataCell(GestureDetector(
-                child: Container(
-                  height: 30,
-                  width: 90,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Center(
-                      child: Text(
-                    "Confirm  ",
-                    style: AppTextStyle.w400(fontSize: 15, color: AppColors.white),
-                  )),
+        child: Padding(
+          padding: const EdgeInsets.all(50.0),
+          child: DataTable(
+            dataTextStyle: AppTextStyle.w700(fontSize: 15),
+            columnSpacing: 35,
+            border: TableBorder.all(color: Colors.black),
+            columns: [
+              DataColumn(
+                label: Text(
+                  "Index",
+                  style: AppTextStyle.w700(fontSize: 20),
                 ),
-              )),
-              DataCell(GestureDetector(
-                child: Container(
-                  height: 30,
-                  width: 90,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Center(
-                      child: Text(
-                    "View",
-                    style: AppTextStyle.w400(fontSize: 15, color: AppColors.white),
-                  )),
+              ),
+              DataColumn(
+                label: Text(
+                  "Food Image",
+                  style: AppTextStyle.w700(fontSize: 20),
                 ),
-              )),
-            ]);
-          }).toList(),
+              ),
+              DataColumn(
+                label: Text(
+                  "Food Name",
+                  style: AppTextStyle.w700(fontSize: 20),
+                ),
+              ),
+              DataColumn(
+                label: Text(
+                  "User Name",
+                  style: AppTextStyle.w700(fontSize: 20),
+                ),
+              ),
+              DataColumn(
+                label: Text(
+                  "Order ID",
+                  style: AppTextStyle.w700(fontSize: 20),
+                ),
+              ),
+              DataColumn(
+                label: Text(
+                  "No Of Items",
+                  style: AppTextStyle.w700(fontSize: 20),
+                ),
+              ),
+              DataColumn(
+                label: Text(
+                  "Payment Type",
+                  style: AppTextStyle.w700(fontSize: 20),
+                ),
+              ),
+              DataColumn(
+                label: Text(
+                  "Payment",
+                  style: AppTextStyle.w700(fontSize: 20),
+                ),
+              ),
+              DataColumn(
+                label: Text(
+                  "Date",
+                  style: AppTextStyle.w700(fontSize: 20),
+                ),
+              ),
+              DataColumn(
+                label: Text(
+                  "Order Status",
+                  style: AppTextStyle.w700(fontSize: 20),
+                ),
+              ),
+              DataColumn(
+                label: Text(
+                  "Action",
+                  style: AppTextStyle.w700(fontSize: 20),
+                ),
+              ),
+            ],
+            rows: orders.map((order) {
+              return DataRow(cells: [
+                DataCell(Text(order.index.toString())),
+                DataCell(Image.network(order.foodImage, height: 150, width: 150)),
+                DataCell(Text(order.foodname)),
+                DataCell(Text(order.username)),
+                DataCell(Text(order.orderId)),
+                DataCell(Text(order.noOfItems.toString())),
+                DataCell(Text(order.paymentType)),
+                DataCell(Text(order.payment.toStringAsFixed(2))),
+                DataCell(Text(order.date)),
+                DataCell(GestureDetector(
+                  child: Container(
+                    height: 30,
+                    width: 90,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Center(
+                        child: Text(
+                      "Confirm  ",
+                      style: AppTextStyle.w400(fontSize: 15, color: AppColors.white),
+                    )),
+                  ),
+                )),
+                DataCell(GestureDetector(
+                  child: Container(
+                    height: 30,
+                    width: 90,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Center(
+                        child: Text(
+                      "View",
+                      style: AppTextStyle.w400(fontSize: 15, color: AppColors.white),
+                    )),
+                  ),
+                )),
+              ]);
+            }).toList(),
+          ),
         ),
       ),
     );

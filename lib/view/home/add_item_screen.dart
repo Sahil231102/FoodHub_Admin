@@ -1,14 +1,14 @@
 import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:food_hub_admin/const/colors.dart';
-import 'package:food_hub_admin/controller/image_picker_controller.dart';
+import 'package:food_hub_admin/controller/show_category_controller.dart';
 import 'package:food_hub_admin/view/widget/common_text.dart';
-import 'package:food_hub_admin/view/widget/common_text_form_field.dart';
-import 'package:food_hub_admin/view/widget/sized_box.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:food_hub_admin/const/colors.dart';
+import 'package:food_hub_admin/controller/image_picker_controller.dart';
+import 'package:food_hub_admin/view/widget/common_text_form_field.dart';
+import 'package:food_hub_admin/view/widget/sized_box.dart';
 
 class AddItemScreen extends StatefulWidget {
   const AddItemScreen({super.key});
@@ -18,26 +18,25 @@ class AddItemScreen extends StatefulWidget {
 }
 
 class _AddItemScreenState extends State<AddItemScreen> {
-  final ImagePickerController _imagePickerController = Get.put(ImagePickerController());
+  final ImagePickerController imagePickerController =
+      Get.put(ImagePickerController());
+
+  final ShowCategoryController showCategoryController =
+      Get.put(ShowCategoryController()); // Use the CategoryController
 
   TextEditingController foodName = TextEditingController();
   TextEditingController foodPrice = TextEditingController();
   TextEditingController foodCategory = TextEditingController();
   TextEditingController foodDescription = TextEditingController();
 
-  String? _selectedCategory;
-
-  // Sample list of categories
-  final List<String> _categories = [
-    'Fast Food',
-    'Burgers',
-    'Fried Foods',
-    'Street Food',
-    'Drinks and Sides',
-    "Combo Meals",
-  ];
-
   final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch categories on screen load
+    showCategoryController.showCategory();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,26 +46,27 @@ class _AddItemScreenState extends State<AddItemScreen> {
           return SafeArea(
             child: LayoutBuilder(
               builder: (context, constraints) {
-                // Check if the layout is for web or mobile
                 final isWeb = constraints.maxWidth > 600;
                 return SingleChildScrollView(
                   padding: const EdgeInsets.all(16),
-                  child: isWeb
-                      ? Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(child: _buildImageGrid(controller)),
-                            20.sizeHeight,
-                            Expanded(child: _buildForm(controller)),
-                          ],
-                        )
-                      : Column(
-                          children: [
-                            _buildImageGrid(controller),
-                            20.sizeHeight,
-                            _buildForm(controller),
-                          ],
-                        ),
+                  child: Flex(
+                    direction: isWeb ? Axis.horizontal : Axis.vertical,
+                    crossAxisAlignment: isWeb
+                        ? CrossAxisAlignment.start
+                        : CrossAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        flex: isWeb ? 1 : 0,
+                        child:
+                            _buildImageGrid(controller, constraints.maxWidth),
+                      ),
+                      if (isWeb) 20.sizeWidth else 20.sizeHeight,
+                      Flexible(
+                        flex: isWeb ? 1 : 0,
+                        child: _buildForm(controller),
+                      ),
+                    ],
+                  ),
                 );
               },
             ),
@@ -76,7 +76,8 @@ class _AddItemScreenState extends State<AddItemScreen> {
     );
   }
 
-  Widget _buildImageGrid(ImagePickerController controller) {
+  Widget _buildImageGrid(ImagePickerController controller, double maxWidth) {
+    final crossAxisCount = maxWidth > 800 ? 4 : (maxWidth > 600 ? 3 : 2);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -85,20 +86,28 @@ class _AddItemScreenState extends State<AddItemScreen> {
           children: [
             Text(
               "Food Images (${controller.selectedImages.length}/5)",
-              style: AppTextStyle.w600(fontSize: 16),
+              style: AppTextStyle.w600(fontSize: 16, color: AppColors.black),
             ),
-            50.sizeWidth,
             if (controller.selectedImages.length < 5)
-              IconButton(
-                  autofocus: true,
-                  constraints:
-                      BoxConstraints(minWidth: 2, maxWidth: 120, maxHeight: 120, minHeight: 20),
-                  onPressed: () => controller.pickMultipleImages(),
-                  icon: Icon(
-                    Icons.add,
-                  )),
+              GestureDetector(
+                child: Container(
+                  height: 50,
+                  width: 50,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.grey, width: 3),
+                  ),
+                  child: IconButton(
+                      onPressed: () => controller.pickMultipleImages(),
+                      icon: const Icon(
+                        Icons.add,
+                        color: AppColors.primary,
+                      )),
+                ),
+              )
           ],
         ),
+        10.sizeHeight,
         if (controller.selectedImages.isEmpty)
           Center(
             child: Container(
@@ -125,28 +134,30 @@ class _AddItemScreenState extends State<AddItemScreen> {
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
               crossAxisSpacing: 8,
               mainAxisSpacing: 8,
             ),
             itemCount: controller.selectedImages.length,
             itemBuilder: (context, index) {
-              return _buildImageTile(controller.selectedImages[index], controller, index);
+              return _buildImageTile(
+                  controller.selectedImages[index], controller, index);
             },
           ),
       ],
     );
   }
 
-  Widget _buildImageTile(XFile image, ImagePickerController controller, int index) {
+  Widget _buildImageTile(
+      XFile image, ImagePickerController controller, int index) {
     return Stack(
       children: [
         Container(
           width: 150,
           height: 150,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(8),
             border: Border.all(color: Colors.grey[300]!),
           ),
           child: ClipRRect(
@@ -167,6 +178,8 @@ class _AddItemScreenState extends State<AddItemScreen> {
           ),
         ),
         Positioned(
+          top: 4,
+          right: 4,
           child: InkWell(
             onTap: () => controller.removeImage(index),
             child: Container(
@@ -192,104 +205,149 @@ class _AddItemScreenState extends State<AddItemScreen> {
       key: _formKey,
       child: Column(
         children: [
-          CommonTextFormField(
-            controller: foodName,
-            hintText: "Enter Food Name",
-            validator: (p0) {
-              if (p0 != null && p0.isEmpty) {
-                return "Please Enter Food Name";
-              }
-              return null;
-            },
-          ),
-          20.sizeHeight,
-          CommonTextFormField(
-            controller: foodPrice,
-            hintText: "Enter Food Price",
-            validator: (p0) {
-              if (p0 != null && p0.isEmpty) {
-                return "Please Enter Food Price";
-              }
-              return null;
-            },
-          ),
-          20.sizeHeight,
-          DropdownButtonFormField<String>(
-            value: _selectedCategory,
-            decoration: InputDecoration(
-              hintText: 'Select Food Category',
-              hintStyle: AppTextStyle.w600(fontSize: 15),
-              border: const OutlineInputBorder(),
-            ),
-            items: _categories.map((category) {
-              return DropdownMenuItem(
-                value: category,
-                child: Text(
-                  category,
-                  style: AppTextStyle.w700(fontSize: 17, color: AppColors.black),
-                ),
-              );
-            }).toList(),
-            onChanged: (value) {
-              _selectedCategory = value;
-              foodCategory.text = _selectedCategory.toString();
-            },
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please select a food category';
-              }
-              return null;
-            },
-          ),
-          20.sizeHeight,
-          CommonTextFormField(
-            controller: foodDescription,
-            hintText: "Enter Food Description",
-            validator: (p0) {
-              if (p0 != null && p0.isEmpty) {
-                return "Please Enter Food Description";
-              }
-              return null;
-            },
-          ),
-          20.sizeHeight,
-          SizedBox(
-            width: double.infinity,
-            height: 50,
-            child: ElevatedButton(
-              onPressed: () {
-                if (_formKey.currentState?.validate() ?? false) {
-                  if (controller.selectedImages.isEmpty) {
-                    Get.snackbar(
-                      "Error",
-                      "Please select at least one image",
-                      backgroundColor: AppColors.red,
-                      colorText: Colors.white,
-                    );
-                    return;
-                  }
-
-                  controller.uploadFoodDetailsToFirestore(
-                    context: context,
-                    foodName: foodName.text,
-                    foodPrice: foodPrice.text,
-                    foodCategory: foodCategory.text,
-                    foodDescription: foodDescription.text,
-                  );
-                  foodName.clear();
-                  foodDescription.clear();
-                  foodCategory.clear();
-                  foodPrice.clear();
-                }
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-              child: controller.loading
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : Text(
-                      "ADD FOOD",
-                      style: AppTextStyle.w700(color: Colors.white, fontSize: 20),
+          Obx(
+            () {
+              if (showCategoryController.isLoading.value) {
+                return const Center(
+                    child:
+                        CircularProgressIndicator()); // Show the loading spinner
+              } else {
+                // Show the form when the data is not loading
+                return Column(
+                  children: [
+                    CommonTextFormField(
+                      controller: foodName,
+                      labelText: "Enter Food Name",
+                      validator: (p0) {
+                        if (p0 != null && p0.isEmpty) {
+                          return "Please Enter Food Name";
+                        }
+                        return null;
+                      },
                     ),
-            ),
+                    20.sizeHeight,
+                    CommonTextFormField(
+                      controller: foodPrice,
+                      labelText: "Enter Food Price",
+                      validator: (p0) {
+                        if (p0 != null && p0.isEmpty) {
+                          return "Please Enter Food Price";
+                        }
+                        return null;
+                      },
+                    ),
+                    20.sizeHeight,
+                    Obx(() {
+                      if (showCategoryController.categories.isEmpty) {
+                        return Text(
+                          "No categories available",
+                          style: AppTextStyle.w500(
+                              fontSize: 16, color: AppColors.red),
+                        );
+                      } else {
+                        return DropdownButtonFormField<String>(
+                          value: showCategoryController
+                                  .selectedCategory.value.isEmpty
+                              ? null
+                              : showCategoryController.selectedCategory.value,
+                          decoration: InputDecoration(
+                            errorStyle: AppTextStyle.w500(
+                                fontSize: 13, color: AppColors.red),
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide:
+                                    const BorderSide(color: AppColors.primary)),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide:
+                                  const BorderSide(color: AppColors.grey),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide:
+                                  const BorderSide(color: AppColors.red),
+                            ),
+                            labelText: 'Select Food Category',
+                            labelStyle: AppTextStyle.w700(
+                                fontSize: 15, color: AppColors.black),
+                          ),
+                          onChanged: (value) {
+                            showCategoryController.setSelectedCategory(value!);
+                            foodCategory.text = value;
+                          },
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please select a food category';
+                            }
+                            return null;
+                          },
+                          items:
+                              showCategoryController.categories.map((category) {
+                            return DropdownMenuItem<String>(
+                              value: category.categoryName,
+                              child: Text(category.categoryName),
+                            );
+                          }).toList(),
+                        );
+                      }
+                    }),
+                    20.sizeHeight,
+                    CommonTextFormField(
+                      controller: foodDescription,
+                      labelText: "Enter Food Description",
+                      validator: (p0) {
+                        if (p0 != null && p0.isEmpty) {
+                          return "Please Enter Food Description";
+                        }
+                        return null;
+                      },
+                    ),
+                    20.sizeHeight,
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (_formKey.currentState?.validate() ?? false) {
+                            if (controller.selectedImages.isEmpty) {
+                              Get.snackbar(
+                                "Error",
+                                "Please select at least one image",
+                                backgroundColor: AppColors.red,
+                                colorText: Colors.white,
+                              );
+                              return;
+                            }
+
+                            controller.uploadFoodDetailsToFirestore(
+                              context: context,
+                              foodName: foodName.text,
+                              foodPrice: foodPrice.text,
+                              foodCategory: foodCategory.text,
+                              foodDescription: foodDescription.text,
+                            );
+                            foodName.clear();
+                            foodDescription.clear();
+                            foodCategory.clear();
+                            foodPrice.clear();
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary),
+                        child: controller.loading
+                            ? const CircularProgressIndicator(
+                                color: Colors.white)
+                            : Text(
+                                "ADD FOOD",
+                                style: AppTextStyle.w700(
+                                    color: Colors.white, fontSize: 20),
+                              ),
+                      ),
+                    ),
+                  ],
+                );
+              }
+            },
           ),
         ],
       ),
