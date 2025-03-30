@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:typed_data';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:food_hub_admin/const/Images.dart';
@@ -19,17 +16,19 @@ class ShowItemScreen extends StatefulWidget {
 }
 
 class _ShowItemScreenState extends State<ShowItemScreen> {
-  final ImagePickerController imagePickerController = Get.put(ImagePickerController());
+  final ImagePickerController imagePickerController =
+      Get.put(ImagePickerController());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.white,
       body: GetBuilder<ImagePickerController>(
         builder: (controller) {
           return StreamBuilder<QuerySnapshot>(
-            stream: FirebaseServices.foodItemsCollection // Ensures oldest first, newest last
-                .snapshots(),
-            builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            stream: FirebaseServices.foodItemsCollection.snapshots(),
+            builder:
+                (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               }
@@ -43,7 +42,8 @@ class _ShowItemScreenState extends State<ShowItemScreen> {
                       SizedBox(height: 20),
                       Text(
                         "Error loading data. Please try again later.",
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 18),
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -60,7 +60,8 @@ class _ShowItemScreenState extends State<ShowItemScreen> {
                         height: 420,
                         width: 400,
                       ),
-                      Text("No Food Items. Add Food Item.", style: AppTextStyle.w700(fontSize: 20)),
+                      Text("No Food Items. Add Food Item.",
+                          style: AppTextStyle.w700(fontSize: 20)),
                     ],
                   ),
                 );
@@ -71,7 +72,7 @@ class _ShowItemScreenState extends State<ShowItemScreen> {
               return SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Padding(
-                  padding: const EdgeInsets.all(50.0),
+                  padding: const EdgeInsets.all(10.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -115,79 +116,69 @@ class _ShowItemScreenState extends State<ShowItemScreen> {
                           final itemIndex = entry.key + 1;
                           final food = entry.value;
                           final foodId = food['food_id'];
-                          final String foodName = food['food_name'] ?? 'No Name';
-                          final String foodCategory = food['food_category'] ?? 'No Category';
+                          final String foodName =
+                              food['food_name'] ?? 'No Name';
+                          final String foodCategory =
+                              food['food_category'] ?? 'No Category';
                           final String foodPrice = food['food_price'] ?? '0';
-                          final List<dynamic> base64Images = food['images'] ?? [];
-
-                          Uint8List? firstImageBytes;
-                          if (base64Images.isNotEmpty) {
-                            try {
-                              firstImageBytes = base64Decode(base64Images[0] as String);
-                            } catch (e) {
-                              GetSnackBar(
-                                title: "$e",
-                              );
-                            }
-                          }
+                          final List<dynamic> base64Images =
+                              food['image_urls'] ?? [];
+                          final String imageUrl = base64Images.isNotEmpty
+                              ? base64Images[0]
+                              : 'assets/placeholder.png';
 
                           return DataRow(cells: [
                             DataCell(Text(itemIndex.toString())),
                             DataCell(
-                              firstImageBytes != null
-                                  ? Padding(
-                                      padding: const EdgeInsets.all(2.0),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(10),
-                                            image: DecorationImage(
-                                                image: MemoryImage(
-                                                  firstImageBytes,
-                                                ),
-                                                fit: BoxFit.cover)),
-                                      ),
-                                    )
-                                  : const Image(
-                                      image: AssetImage('assets/placeholder.png'),
-                                      width: 80,
-                                      height: 80,
+                              Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Container(
+                                  width: 60,
+                                  height: 60,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    image: DecorationImage(
+                                      image: imageUrl.startsWith('http')
+                                          ? NetworkImage(imageUrl)
+                                          : AssetImage(imageUrl)
+                                              as ImageProvider,
                                       fit: BoxFit.cover,
                                     ),
-                            ),
-                            DataCell(
-                              Text(
-                                foodName,
+                                  ),
+                                ),
                               ),
                             ),
-                            DataCell(
-                              Text(
-                                foodCategory,
-                              ),
-                            ),
-                            DataCell(
-                              Text(
-                                "₹$foodPrice",
-                              ),
-                            ),
+                            DataCell(Text(foodName)),
+                            DataCell(Text(foodCategory)),
+                            DataCell(Text("₹$foodPrice")),
                             DataCell(
                               Row(
                                 children: [
                                   ElevatedButton(
                                     style: ElevatedButton.styleFrom(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            8), // Optional rounded corners
+                                      ),
                                       backgroundColor: AppColors.primary,
                                     ),
                                     onPressed: () {
-                                      Get.to(() => FoodDetailsScreen(documentId: foodId));
+                                      Get.to(() => FoodDetailsScreen(
+                                          documentId: foodId));
                                     },
                                     child: Text(
                                       "View",
-                                      style:
-                                          AppTextStyle.w700(fontSize: 18, color: AppColors.white),
+                                      style: AppTextStyle.w700(
+                                          fontSize: 18, color: AppColors.white),
                                     ),
                                   ),
                                   const SizedBox(width: 10),
                                   ElevatedButton(
                                     style: ElevatedButton.styleFrom(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            8), // Optional rounded corners
+                                      ),
                                       backgroundColor: AppColors.black,
                                     ),
                                     onPressed: () {
@@ -197,11 +188,13 @@ class _ShowItemScreenState extends State<ShowItemScreen> {
                                           return AlertDialog(
                                             title: Text(
                                               "Remove Item",
-                                              style: AppTextStyle.w700(fontSize: 18),
+                                              style: AppTextStyle.w700(
+                                                  fontSize: 18),
                                             ),
                                             content: Text(
                                               "Are you sure you want to remove this item?",
-                                              style: AppTextStyle.w700(fontSize: 18),
+                                              style: AppTextStyle.w700(
+                                                  fontSize: 18),
                                             ),
                                             actions: [
                                               TextButton(
@@ -210,18 +203,21 @@ class _ShowItemScreenState extends State<ShowItemScreen> {
                                                 },
                                                 child: Text(
                                                   "Cancel",
-                                                  style: AppTextStyle.w700(fontSize: 18),
+                                                  style: AppTextStyle.w700(
+                                                      fontSize: 18),
                                                 ),
                                               ),
                                               TextButton(
                                                 onPressed: () {
-                                                  controller.removeItem(foodId: foodId);
+                                                  controller.removeItem(
+                                                      foodId: foodId);
                                                   Navigator.pop(context);
                                                 },
                                                 child: Text(
                                                   "Remove",
                                                   style: AppTextStyle.w700(
-                                                      fontSize: 18, color: AppColors.red),
+                                                      fontSize: 18,
+                                                      color: AppColors.red),
                                                 ),
                                               ),
                                             ],
@@ -231,8 +227,8 @@ class _ShowItemScreenState extends State<ShowItemScreen> {
                                     },
                                     child: Text(
                                       "Remove",
-                                      style:
-                                          AppTextStyle.w700(fontSize: 18, color: AppColors.white),
+                                      style: AppTextStyle.w700(
+                                          fontSize: 18, color: AppColors.white),
                                     ),
                                   ),
                                 ],

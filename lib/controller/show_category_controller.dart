@@ -1,8 +1,7 @@
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:typed_data'; // For handling Uint8List (image data)
-import 'dart:convert';
-import 'package:http/http.dart' as http; // For making HTTP requests
+
 import 'package:food_hub_admin/services/cloudinary_service.dart'; // For uploading images to Cloudinary
 
 import 'package:image_picker/image_picker.dart'; // For base64 decoding

@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:food_hub_admin/const/colors.dart';
 import 'package:food_hub_admin/controller/image_picker_controller.dart';
 import 'package:food_hub_admin/view/home/update_food_item.dart';
-import 'package:food_hub_admin/view/widget/common_button.dart';
 import 'package:food_hub_admin/view/widget/common_text.dart';
 import 'package:food_hub_admin/view/widget/sized_box.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class FoodDetailsScreen extends StatefulWidget {
   final String documentId;
@@ -133,9 +133,12 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
                     _buildTableRow("Food Category:", foodCategory),
                     _buildTableRow("Description:", foodDescription),
                     _buildTableRow(
-                        "uploaded_at:",
-                        foodData['uploaded_at']?.toDate().toString() ??
-                            "Unknown"),
+                      "uploaded_at:",
+                      foodData['updated_at'] != null
+                          ? DateFormat('dd-MM-yyyy hh:mm a')
+                              .format(foodData['updated_at'].toDate())
+                          : "Unknown",
+                    ),
                     TableRow(
                       children: [
                         Padding(
@@ -186,36 +189,47 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
                                     ),
                                   ),
                                   onPressed: () {
-                                    Get.defaultDialog(
-                                      title: "Delete Food Item",
-                                      content: Column(
-                                        children: [
-                                          const Text(
-                                              "Are you sure you want to delete this food item?"),
-                                          20.sizeHeight,
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceEvenly,
-                                            children: [
-                                              CommonButton(
-                                                text: "Cancel",
-                                                onTap: () {
-                                                  Get.back();
-                                                },
-                                              ),
-                                              CommonButton(
-                                                text: "Delete",
-                                                onTap: () {
-                                                  imagePickerController
-                                                      .removeItem(
-                                                          foodId: foodId);
-                                                  Get.back();
-                                                },
-                                              ),
-                                            ],
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          title: Text(
+                                            "Remove Item",
+                                            style:
+                                                AppTextStyle.w700(fontSize: 18),
                                           ),
-                                        ],
-                                      ),
+                                          content: Text(
+                                            "Are you sure you want to remove this item?",
+                                            style:
+                                                AppTextStyle.w700(fontSize: 18),
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text(
+                                                "Cancel",
+                                                style: AppTextStyle.w700(
+                                                    fontSize: 18),
+                                              ),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                imagePickerController
+                                                    .removeItem(foodId: foodId);
+                                                Get.back();
+                                              },
+                                              child: Text(
+                                                "Remove",
+                                                style: AppTextStyle.w700(
+                                                    fontSize: 18,
+                                                    color: AppColors.red),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      },
                                     );
                                   },
                                   child: Text(

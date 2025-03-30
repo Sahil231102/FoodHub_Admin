@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:food_hub_admin/controller/flutter_image_compress.dart';
 import 'package:food_hub_admin/services/cloudinary_service.dart';
 import 'package:food_hub_admin/services/firebase_service.dart';
+import 'package:food_hub_admin/view/widget/common_text.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -76,7 +77,7 @@ class ImagePickerController extends GetxController {
         'food_category': foodCategory.trim(),
         'food_description': foodDescription.trim(),
         'image_urls': validImageUrls,
-        'uploaded_at': FieldValue.serverTimestamp(),
+        'updated_at': FieldValue.serverTimestamp(),
       });
 
       Get.snackbar("Success", "Food item added successfully",
@@ -131,9 +132,16 @@ class ImagePickerController extends GetxController {
         'image_urls': updatedImageUrls,
         'updated_at': FieldValue.serverTimestamp(),
       });
-
+      Get.back();
       Get.snackbar("Success", "Food item updated successfully",
-          backgroundColor: Colors.green, colorText: Colors.white);
+          titleText: Text(
+            "Success",
+            style: AppTextStyle.w700(fontSize: 18),
+          ),
+          messageText: Text("Food item updated successfully",
+              style: AppTextStyle.w700(fontSize: 18)),
+          backgroundColor: Colors.green,
+          colorText: Colors.white);
     } catch (e) {
       Get.snackbar("Error", "Failed to update food item: ${e.toString()}",
           backgroundColor: Colors.red, colorText: Colors.white);

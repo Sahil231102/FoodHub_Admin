@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:food_hub_admin/const/colors.dart';
 import 'package:food_hub_admin/controller/show_category_controller.dart';
 import 'package:food_hub_admin/view/widget/common_text.dart';
 import 'package:food_hub_admin/view/widget/sized_box.dart';
@@ -26,9 +27,7 @@ class _ShowCategoryScreenState extends State<ShowCategoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Categories', style: AppTextStyle.w700(fontSize: 22)),
-      ),
+      backgroundColor: AppColors.white,
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
@@ -136,7 +135,7 @@ class _ShowCategoryScreenState extends State<ShowCategoryScreen> {
                 decoration: InputDecoration(
                   labelText: 'Category Name',
                   labelStyle: AppTextStyle.w600(fontSize: 16),
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 10),
@@ -152,11 +151,11 @@ class _ShowCategoryScreenState extends State<ShowCategoryScreen> {
 
               // Select Image Button
               TextButton.icon(
-                icon: Icon(Icons.image),
+                icon: const Icon(Icons.image),
                 label: Text(
                   "Select Image",
-                  style:
-                      AppTextStyle.w600(fontSize: 16, color: Color(0xff6750a4)),
+                  style: AppTextStyle.w600(
+                      fontSize: 16, color: const Color(0xff6750a4)),
                 ),
                 onPressed: () async {
                   final ImagePicker picker = ImagePicker();
@@ -194,6 +193,7 @@ class _ShowCategoryScreenState extends State<ShowCategoryScreen> {
                         backgroundColor: Colors.green,
                         colorText: Colors.white,
                       );
+                      // ignore: use_build_context_synchronously
                       context.loaderOverlay.hide();
                     },
                     child:
@@ -238,8 +238,16 @@ class _ShowCategoryScreenState extends State<ShowCategoryScreen> {
               await controller.deleteCategory(category.categoryId);
               Get.back();
               Get.snackbar(
-                'Success',
-                'Category deleted successfully',
+                '',
+                '',
+                titleText: Text(
+                  'Success',
+                  style: AppTextStyle.w700(fontSize: 18),
+                ),
+                messageText: Text(
+                  'Category deleted successfully',
+                  style: AppTextStyle.w600(fontSize: 16),
+                ),
                 snackPosition: SnackPosition.TOP,
                 backgroundColor: Colors.green,
                 colorText: Colors.white,

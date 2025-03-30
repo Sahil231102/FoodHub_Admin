@@ -55,7 +55,11 @@ class _UpdateItemScreenState extends State<UpdateItemScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Update Food Item")),
+      appBar: AppBar(
+          title: Text(
+        "Update Food Item",
+        style: AppTextStyle.w600(fontSize: 20),
+      )),
       body: GetBuilder<ImagePickerController>(
         builder: (controller) {
           return SingleChildScrollView(
@@ -97,7 +101,7 @@ class _UpdateItemScreenState extends State<UpdateItemScreen> {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
+            crossAxisCount: 5,
             crossAxisSpacing: 8,
             mainAxisSpacing: 8,
           ),
@@ -162,7 +166,21 @@ class _UpdateItemScreenState extends State<UpdateItemScreen> {
           Obx(() {
             return DropdownButtonFormField<String>(
               value: foodCategory.text,
-              decoration: InputDecoration(labelText: 'Select Food Category'),
+              decoration: InputDecoration(
+                labelText: 'Select Food Category',
+                labelStyle:
+                    AppTextStyle.w600(fontSize: 18, color: AppColors.grey),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(color: Colors.grey, width: 1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide:
+                      const BorderSide(color: AppColors.primary, width: 1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              style: AppTextStyle.w600(fontSize: 16),
               onChanged: (value) {
                 foodCategory.text = value!;
               },
@@ -186,6 +204,13 @@ class _UpdateItemScreenState extends State<UpdateItemScreen> {
             width: double.infinity,
             height: 50,
             child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.circular(8), // Optional rounded corners
+                ),
+              ),
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
                   imagePickerController.updateFoodDetails(
@@ -201,7 +226,9 @@ class _UpdateItemScreenState extends State<UpdateItemScreen> {
               },
               child: controller.loading
                   ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text("UPDATE FOOD", style: TextStyle(fontSize: 20)),
+                  : Text("UPDATE FOOD",
+                      style: AppTextStyle.w700(
+                          color: AppColors.white, fontSize: 20)),
             ),
           ),
         ],

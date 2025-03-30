@@ -41,6 +41,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.white,
       body: GetBuilder<ImagePickerController>(
         builder: (controller) {
           return SafeArea(
@@ -246,7 +247,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                         );
                       } else {
                         return DropdownButtonFormField<String>(
-                          style: AppTextStyle.w500(
+                          style: AppTextStyle.w600(
                               fontSize: 15, color: AppColors.black),
                           value: showCategoryController
                                   .selectedCategory.value.isEmpty
@@ -271,7 +272,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                             ),
                             labelText: 'Select Food Category',
                             labelStyle: AppTextStyle.w700(
-                                fontSize: 15, color: AppColors.black),
+                                fontSize: 15, color: AppColors.grey),
                           ),
                           onChanged: (value) {
                             showCategoryController.setSelectedCategory(value!);
@@ -330,11 +331,16 @@ class _AddItemScreenState extends State<AddItemScreen> {
                             );
                             foodName.clear();
                             foodDescription.clear();
+                            showCategoryController.setSelectedCategory("");
                             foodCategory.clear();
                             foodPrice.clear();
                           }
                         },
                         style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                  8), // Optional rounded corners
+                            ),
                             backgroundColor: AppColors.primary),
                         child: controller.loading
                             ? const CircularProgressIndicator(

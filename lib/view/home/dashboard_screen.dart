@@ -32,13 +32,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _dashboardCountController.toggleLoad(true);
     await _dashboardCountController.fetchUserCount();
     await _dashboardCountController.fetchFoodItemCount();
+    await _dashboardCountController.fetchOrderCount();
+    await _dashboardCountController.fetchTotalAmount();
+
     _dashboardCountController.toggleLoad(false);
 
     data = [
-      {"nameText": "Total Order", "countText": "120", "color": Colors.pink},
+      {
+        "nameText": "Total Order",
+        "countText": "${_dashboardCountController.orderCount}",
+        "color": Colors.pink
+      },
       {
         "nameText": "Total Payment",
-        "countText": "15000",
+        "countText": "₹ ${_dashboardCountController.totalAmount}",
         "color": Colors.black
       },
       {
@@ -66,144 +73,157 @@ class _DashboardScreenState extends State<DashboardScreen> {
           builder: (context, constraints) {
             final isWeb = constraints.maxWidth > 600;
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
+            return ListView(
               children: [
                 Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Wrap(
-                      spacing: isWeb ? 20 : 10,
-                      runSpacing: 10,
-                      alignment: WrapAlignment.center,
-                      children: List.generate(
-                        data.length,
-                        (index) {
-                          final item = data[index];
-                          return DashboardCommonCounterButton(
-                            nameText: item["nameText"],
-                            countText: item["countText"],
-                            colors: item["color"],
-                          );
-                        },
-                      ),
-                    ),
-                    StreamBuilder<QuerySnapshot>(
-                      stream: FirebaseServices.foodItemsCollection.snapshots(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                              child: CircularProgressIndicator());
-                        }
+                    Column(
+                      children: [
+                        Wrap(
+                          spacing: isWeb ? 20 : 10,
+                          runSpacing: 10,
+                          alignment: WrapAlignment.center,
+                          children: List.generate(
+                            data.length,
+                            (index) {
+                              final item = data[index];
+                              return DashboardCommonCounterButton(
+                                nameText: item["nameText"],
+                                countText: item["countText"],
+                                colors: item["color"],
+                              );
+                            },
+                          ),
+                        ),
+                        StreamBuilder<QuerySnapshot>(
+                          stream:
+                              FirebaseServices.foodItemsCollection.snapshots(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                  child: CircularProgressIndicator());
+                            }
 
-                        if (snapshot.hasError) {
-                          return const Center(
-                              child: Text("Error loading data."));
-                        }
+                            if (snapshot.hasError) {
+                              return const Center(
+                                  child: Text("Error loading data."));
+                            }
 
-                        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                          return Center(
-                            child: Column(
-                              children: [
-                                const Image(
-                                  image: AssetImage(AppImages.notFoundFood),
-                                  height: 420,
-                                  width: 400,
-                                ),
-                                Text(
-                                  "No Food Items. Add Food Item.",
-                                  style: AppTextStyle.w700(fontSize: 20),
-                                ),
-                              ],
-                            ),
-                          );
-                        }
-
-                        final List<DocumentSnapshot> foodItems =
-                            snapshot.data!.docs;
-
-                        return ListView.builder(
-                          physics: const NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: foodItems.length,
-                          itemBuilder: (context, index) {
-                            final food = foodItems[index];
-                            final String foodName =
-                                food['food_name'] ?? 'No Name';
-                            final String foodCategory =
-                                food['food_category'] ?? 'No Category';
-                            final String foodPrice = food['food_price'] ?? '0';
-                            final List<dynamic> imageUrls =
-                                food['image_urls'] ??
-                                    []; // Corrected field name
-
-                            return Card(
-                              margin: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 8),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Row(
+                            if (!snapshot.hasData ||
+                                snapshot.data!.docs.isEmpty) {
+                              return Center(
+                                child: Column(
                                   children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(10),
-                                      child: imageUrls.isNotEmpty
-                                          ? Image.network(
-                                              imageUrls
-                                                  .first, // Show first image from Firestore
-                                              width: 80,
-                                              height: 80,
-                                              fit: BoxFit.cover,
-                                            )
-                                          : Image.asset(
-                                              'assets/placeholder.png', // Placeholder if no image found
-                                              width: 80,
-                                              height: 80,
-                                            ),
+                                    const Image(
+                                      image: AssetImage(AppImages.notFoundFood),
+                                      height: 420,
+                                      width: 400,
                                     ),
-                                    const SizedBox(width: 16),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(foodName,
-                                              style: AppTextStyle.w700(
-                                                  fontSize: 18)),
-                                          Text(foodCategory,
-                                              style: AppTextStyle.w700(
-                                                  fontSize: 16)),
-                                          Text(
-                                            "Price: ₹$foodPrice",
-                                            style: AppTextStyle.w700(
-                                                color: AppColors.green),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                          backgroundColor: AppColors.primary),
-                                      onPressed: () => Get.to(() =>
-                                          FoodDetailsScreen(
-                                              documentId: food['food_id'])),
-                                      child: Text(
-                                        "View",
-                                        style: AppTextStyle.w700(
-                                            color: AppColors.white,
-                                            fontSize: 18),
-                                      ),
+                                    Text(
+                                      "No Food Items. Add Food Item.",
+                                      style: AppTextStyle.w700(fontSize: 20),
                                     ),
                                   ],
                                 ),
-                              ),
+                              );
+                            }
+
+                            final List<DocumentSnapshot> foodItems =
+                                snapshot.data!.docs;
+
+                            return ListView.builder(
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount: foodItems.length,
+                              itemBuilder: (context, index) {
+                                final food = foodItems[index];
+                                final String foodName =
+                                    food['food_name'] ?? 'No Name';
+                                final String foodCategory =
+                                    food['food_category'] ?? 'No Category';
+                                final String foodPrice =
+                                    food['food_price'] ?? '0';
+                                final List<dynamic> imageUrls =
+                                    food['image_urls'] ??
+                                        []; // Corrected field name
+
+                                return Card(
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 8),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Row(
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          child: imageUrls.isNotEmpty
+                                              ? Image.network(
+                                                  imageUrls
+                                                      .first, // Show first image from Firestore
+                                                  width: 80,
+                                                  height: 80,
+                                                  fit: BoxFit.cover,
+                                                )
+                                              : Image.asset(
+                                                  'assets/placeholder.png', // Placeholder if no image found
+                                                  width: 80,
+                                                  height: 80,
+                                                ),
+                                        ),
+                                        const SizedBox(width: 16),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(foodName,
+                                                  style: AppTextStyle.w700(
+                                                      fontSize: 18)),
+                                              Text(foodCategory,
+                                                  style: AppTextStyle.w700(
+                                                      fontSize: 14)),
+                                              Text(
+                                                "Price: ₹$foodPrice",
+                                                style: AppTextStyle.w700(
+                                                    color: AppColors.green),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(
+                                                    8), // Optional rounded corners
+                                              ),
+                                              backgroundColor:
+                                                  AppColors.primary),
+                                          onPressed: () => Get.to(() =>
+                                              FoodDetailsScreen(
+                                                  documentId: food['food_id'])),
+                                          child: Text(
+                                            "View",
+                                            style: AppTextStyle.w700(
+                                                color: AppColors.white,
+                                                fontSize: 18),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
                             );
                           },
-                        );
-                      },
+                        ),
+                      ],
                     ),
                   ],
                 ),

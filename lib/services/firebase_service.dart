@@ -4,6 +4,8 @@ class FirebaseCollectionName {
   static const foodItems = "FoodItems";
 
   static const user = "user";
+
+  static const orders = "orders";
 }
 
 class FirebaseServices {
@@ -12,4 +14,6 @@ class FirebaseServices {
 
   static CollectionReference<Map<String, dynamic>> userCollection =
       FirebaseFirestore.instance.collection(FirebaseCollectionName.user);
+  static CollectionReference<Map<String, dynamic>> orderCollection =
+      FirebaseFirestore.instance.collection(FirebaseCollectionName.orders);
 }
