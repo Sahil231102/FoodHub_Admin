@@ -8,7 +8,6 @@ import 'package:food_hub_admin/view/widget/common_text.dart';
 import 'package:food_hub_admin/view/widget/common_text_form_field.dart';
 import 'package:food_hub_admin/view/widget/sized_box.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
