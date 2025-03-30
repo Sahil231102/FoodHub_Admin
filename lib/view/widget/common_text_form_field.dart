@@ -24,8 +24,8 @@ class CommonTextFormField extends StatelessWidget {
       controller: controller,
       decoration: InputDecoration(
         labelText: labelText,
-        labelStyle: AppTextStyle.w600(fontSize: 15, color: AppColors.grey),
-        enabledBorder: _Border(color: AppColors.grey),
+        labelStyle: AppTextStyle.w600(fontSize: 15, color: AppColors.black),
+        enabledBorder: _Border(color: AppColors.black),
         focusedBorder: _Border(),
         disabledBorder: _Border(),
         focusedErrorBorder: _Border(color: AppColors.red),

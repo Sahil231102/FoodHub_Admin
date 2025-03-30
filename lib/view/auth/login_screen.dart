@@ -21,7 +21,6 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-
   bool isLoading = false;
 
   @override
@@ -33,19 +32,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        isLoading = true;
-      });
+      setState(() => isLoading = true);
 
-      String email = emailController.text.trim();
-      String password = passwordController.text.trim();
+      bool isAuthenticated = await adminController.authenticateAdmin(
+        emailController.text.trim(),
+        passwordController.text.trim(),
+      );
 
-      bool isAuthenticated =
-          await adminController.authenticateAdmin(email, password);
-
-      setState(() {
-        isLoading = false;
-      });
+      setState(() => isLoading = false);
 
       if (isAuthenticated) {
         StorageManager.saveData("isLoggedIn", true);
@@ -63,21 +57,20 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isWideScreen = MediaQuery.of(context).size.width > 600;
+
     return Scaffold(
       backgroundColor: Colors.red,
       body: Stack(
         children: [
           Container(
             decoration: const BoxDecoration(
-                gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              stops: [0.0, 0.5],
-              colors: [
-                AppColors.primary,
-                AppColors.white,
-              ],
-            )),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [AppColors.primary, AppColors.white],
+              ),
+            ),
           ),
           SafeArea(
             child: Center(
@@ -86,69 +79,39 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: SingleChildScrollView(
                   child: Form(
                     key: _formKey,
-                    child: Row(
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const Expanded(
-                          child: Image(
-                            image: AssetImage("assets/img/rb_29057.png"),
-                            width: 300,
-                            height: 300,
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                        const SizedBox(width: 20),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
+                        if (isWideScreen)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(
-                                "Login",
-                                style: AppTextStyle.w600(fontSize: 30),
+                              const Expanded(
+                                child: Image(
+                                  image: AssetImage("assets/img/rb_29057.png"),
+                                  width: 300,
+                                  height: 300,
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                              const SizedBox(width: 20),
+                              Expanded(child: _loginForm()),
+                            ],
+                          )
+                        else
+                          Column(
+                            children: [
+                              const Image(
+                                image: AssetImage("assets/img/rb_29057.png"),
+                                width: 200,
+                                height: 200,
+                                fit: BoxFit.contain,
                               ),
                               20.sizeHeight,
-                              CommonTextFormField(
-                                controller: emailController,
-                                validator: (p0) =>
-                                    ValidationService.validateEmail(p0),
-                                labelText: "Enter email",
-                              ),
-                              20.sizeHeight,
-                              CommonTextFormField(
-                                controller: passwordController,
-                                validator: (p0) =>
-                                    ValidationService.validatePassword(p0),
-                                labelText: "Enter password",
-                              ),
-                              20.sizeHeight,
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  SizedBox(
-                                    width: 220,
-                                    height: 50,
-                                    child: ElevatedButton(
-                                      onPressed: isLoading ? null : _login,
-                                      style: ElevatedButton.styleFrom(
-                                          backgroundColor: AppColors.primary),
-                                      child: isLoading
-                                          ? const CircularProgressIndicator(
-                                              color: Colors.white)
-                                          : Text(
-                                              "Login",
-                                              style: AppTextStyle.w700(
-                                                  color: Colors.white,
-                                                  fontSize: 20),
-                                            ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                              _loginForm(),
                             ],
                           ),
-                        ),
                       ],
                     ),
                   ),
@@ -158,6 +121,45 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _loginForm() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text("Login", style: AppTextStyle.w600(fontSize: 30)),
+        20.sizeHeight,
+        CommonTextFormField(
+          controller: emailController,
+          validator: ValidationService.validateEmail,
+          labelText: "Enter Email",
+        ),
+        20.sizeHeight,
+        CommonTextFormField(
+          controller: passwordController,
+          validator: ValidationService.validatePassword,
+          labelText: "Enter Ppassword",
+        ),
+        20.sizeHeight,
+        Center(
+          child: SizedBox(
+            width: 220,
+            height: 50,
+            child: ElevatedButton(
+              onPressed: isLoading ? null : _login,
+              style:
+                  ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+              child: isLoading
+                  ? const CircularProgressIndicator(color: Colors.white)
+                  : Text("Login",
+                      style:
+                          AppTextStyle.w700(color: Colors.white, fontSize: 20)),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
