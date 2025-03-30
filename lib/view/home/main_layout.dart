@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:food_hub_admin/const/colors.dart';
+import 'package:food_hub_admin/storage/storage_manager.dart';
+import 'package:food_hub_admin/view/auth/login_screen.dart';
 import 'package:food_hub_admin/view/home/app_screens.dart';
 import 'package:food_hub_admin/view/home/navigation_rail.dart';
 import 'package:food_hub_admin/view/widget/common_text.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
@@ -24,11 +29,50 @@ class _MainLayoutState extends State<MainLayout> {
         backgroundColor: Colors.black87,
         actions: [
           IconButton(
-              onPressed: () {},
-              icon: Icon(
-                Icons.person,
-                color: Colors.white,
-              ))
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: Text(
+                      "Logout",
+                      style: AppTextStyle.w700(fontSize: 18),
+                    ),
+                    content: Text(
+                      "Are you sure you want to logout?",
+                      style: AppTextStyle.w700(fontSize: 18),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          "Cancel",
+                          style: AppTextStyle.w700(fontSize: 18),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          StorageManager.saveData("isLoggedIn", false);
+                          Get.offAll(() => const LoginScreen());
+                        },
+                        child: Text(
+                          "Logout",
+                          style: AppTextStyle.w700(
+                              fontSize: 18, color: AppColors.red),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+            icon: const Icon(
+              Icons.person,
+              color: Colors.white,
+            ),
+          )
         ],
         title: Text(
           currentScreen,

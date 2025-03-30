@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:food_hub_admin/const/colors.dart';
 import 'package:food_hub_admin/services/validation_services.dart';
 import 'package:food_hub_admin/controller/login_controller.dart';
+import 'package:food_hub_admin/storage/storage_manager.dart';
 import 'package:food_hub_admin/view/home/main_layout.dart';
 import 'package:food_hub_admin/view/widget/common_text.dart';
 import 'package:food_hub_admin/view/widget/common_text_form_field.dart';
 import 'package:food_hub_admin/view/widget/sized_box.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -21,7 +23,7 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-  bool isLoading = false; // Loading state
+  bool isLoading = false;
 
   @override
   void dispose() {
@@ -33,7 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
-        isLoading = true; // Start loading
+        isLoading = true;
       });
 
       String email = emailController.text.trim();
@@ -43,10 +45,11 @@ class _LoginScreenState extends State<LoginScreen> {
           await adminController.authenticateAdmin(email, password);
 
       setState(() {
-        isLoading = false; // Stop loading
+        isLoading = false;
       });
 
       if (isAuthenticated) {
+        StorageManager.saveData("isLoggedIn", true);
         Get.offAll(() => const MainLayout());
       } else {
         Get.snackbar(
